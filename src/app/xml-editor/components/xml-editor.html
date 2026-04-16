@@ -1,0 +1,69 @@
+<div class="xml-editor-container">
+  <!-- ─── Toolbar ─── -->
+  <mat-toolbar class="editor-toolbar">
+    <mat-icon class="toolbar-logo">data_object</mat-icon>
+    <span class="toolbar-title">XML Editor</span>
+    <span class="toolbar-spacer"></span>
+
+    @if (!readOnly()) {
+      <button
+        mat-icon-button
+        matTooltip="Import XML"
+        (click)="toggleImport()"
+        [class.active-btn]="importVisible()"
+      >
+        <mat-icon>upload_file</mat-icon>
+      </button>
+    }
+    <button mat-icon-button matTooltip="Copy XML" (click)="copyXml()">
+      <mat-icon>content_copy</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <!-- ─── Import Panel ─── -->
+  @if (importVisible()) {
+    <div class="import-panel">
+      <h3 class="import-title">Import XML</h3>
+      <textarea
+        #importInput
+        class="import-textarea"
+        rows="8"
+        placeholder="Paste your XML here..."
+        spellcheck="false"
+      ></textarea>
+      @if (importError()) {
+        <p class="import-error">{{ importError() }}</p>
+      }
+      <div class="import-actions">
+        <button mat-button (click)="toggleImport()">Cancel</button>
+        <button mat-flat-button (click)="doImport()">Import</button>
+      </div>
+    </div>
+  }
+
+  <!-- ─── Main Content ─── -->
+  <div class="editor-main" [class.with-preview]="showPreview()">
+    <!-- Editor Panel -->
+    <div class="editor-panel">
+      <xml-node-editor
+        [node]="document()"
+        (nodeChange)="onDocumentChange($event)"
+        [controls]="controls()"
+        [readOnly]="readOnly()"
+        [depth]="0"
+        [removable]="false"
+      />
+    </div>
+
+    <!-- Preview Panel -->
+    @if (showPreview()) {
+      <div class="preview-panel">
+        <div class="preview-header">
+          <mat-icon>code</mat-icon>
+          <span>XML Output</span>
+        </div>
+        <pre class="xml-preview"><code>{{ xmlOutput() }}</code></pre>
+      </div>
+    }
+  </div>
+</div>
