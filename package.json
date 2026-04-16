@@ -9,7 +9,7 @@
     "test": "ng test"
   },
   "private": true,
-  "packageManager": "pnpm@11.0.0-rc.1+sha512.0d7d837668eb35b81d28f560ef8ec5e103ff5d162e249fd0d30c546c39a551d290ac9cf15709353b94d2df6eb445bfa465c7a05148d328eda32950c02e40d060",
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
   "dependencies": {
     "@angular/animations": "^21.2.9",
     "@angular/cdk": "^21.2.6",
@@ -21,6 +21,10 @@
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
     "@codemirror/lang-xml": "^6.1.0",
+    "@codemirror/language": "^6.12.3",
+    "@codemirror/lint": "^6.9.5",
+    "@codemirror/state": "^6.6.0",
+    "@codemirror/view": "^6.41.0",
     "codemirror": "^6.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
