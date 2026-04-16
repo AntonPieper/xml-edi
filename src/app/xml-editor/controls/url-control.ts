@@ -22,10 +22,10 @@ import { XmlNode } from '../models/xml-node';
     MatTooltipModule,
   ],
   styles: `
-    :host { display: block; padding: 8px 0; }
+    :host { display: block; }
     .url-control {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
     }
     .url-icon {
@@ -33,9 +33,15 @@ import { XmlNode } from '../models/xml-node';
       font-size: 24px;
       width: 24px;
       height: 24px;
+      margin-top: 16px;
+      flex-shrink: 0;
     }
     .url-field { flex: 1; }
-    .open-btn { color: #546e7a; }
+    .open-btn {
+      color: #546e7a;
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
   `,
   template: `
     <div class="url-control">

@@ -4,20 +4,21 @@
 
 .attribute-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   margin-bottom: 4px;
   flex-wrap: wrap;
+  overflow: hidden;
 }
 
 .attr-name-field {
   flex: 1 1 120px;
-  min-width: 0;
+  min-width: 80px;
 }
 
 .attr-value-field {
   flex: 2 1 150px;
-  min-width: 0;
+  min-width: 80px;
 }
 
 .equals {
@@ -25,12 +26,12 @@
   font-weight: 700;
   font-size: 1.1em;
   color: #90a4ae;
-  padding-bottom: 20px;
+  margin-top: 16px;
 }
 
 .remove-attr-btn {
   color: #b0bec5;
-  margin-bottom: 20px;
+  margin-top: 8px;
   transition: color 0.15s;
 }
 

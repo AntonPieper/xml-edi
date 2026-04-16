@@ -14,27 +14,21 @@ import { XmlNode } from '../models/xml-node';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatFormFieldModule, MatInputModule, MatIconModule],
   styles: `
-    :host { display: block; padding: 8px 0; }
+    :host { display: block; }
     .telephone-control {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 14px;
     }
     .phone-icon {
       color: #546e7a;
-      font-size: 28px;
-      width: 28px;
-      height: 28px;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      margin-top: 16px;
+      flex-shrink: 0;
     }
     .phone-field { flex: 1; }
-    .phone-preview {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.92em;
-      letter-spacing: 0.04em;
-      color: #37474f;
-      margin-top: 4px;
-      padding-left: 42px;
-    }
   `,
   template: `
     <div class="telephone-control">
@@ -50,12 +44,8 @@ import { XmlNode } from '../models/xml-node';
           [readonly]="readOnly()"
           placeholder="+1 (555) 123-4567"
         />
-        <mat-hint>Format: +1 (555) 123-4567</mat-hint>
       </mat-form-field>
     </div>
-    @if (formattedPhone()) {
-      <div class="phone-preview">{{ formattedPhone() }}</div>
-    }
   `,
 })
 export class TelephoneControl {

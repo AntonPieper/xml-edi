@@ -13,7 +13,7 @@ import { XmlNode } from '../models/xml-node';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatSlideToggleModule, MatIconModule],
   styles: `
-    :host { display: block; padding: 12px 0; }
+    :host { display: block; padding: 8px 0; }
     .boolean-control {
       display: flex;
       align-items: center;
@@ -23,6 +23,7 @@ import { XmlNode } from '../models/xml-node';
       font-size: 22px;
       width: 22px;
       height: 22px;
+      flex-shrink: 0;
     }
     .bool-icon.is-true { color: #43a047; }
     .bool-icon.is-false { color: #c62828; }
