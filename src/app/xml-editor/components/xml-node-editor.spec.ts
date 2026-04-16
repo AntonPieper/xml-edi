@@ -8,6 +8,35 @@ import {
   resetIdCounter,
   type XmlNode,
 } from '../models/xml-node';
+import type { XmlSchemaDefinition } from '../models/xml-schema';
+
+const testSchema: XmlSchemaDefinition = {
+  tags: [
+    {
+      name: 'person',
+      title: 'Person',
+      description: 'Contact entry',
+      icon: 'person',
+      attributes: [
+        { name: 'id', title: 'ID', description: 'Unique identifier' },
+        { name: 'role', title: 'Role' },
+      ],
+      allowedChildren: ['name', 'phone'],
+    },
+    {
+      name: 'name',
+      title: 'Full Name',
+      description: "Person's name",
+      icon: 'badge',
+    },
+    {
+      name: 'phone',
+      title: 'Phone Number',
+      description: 'Telephone',
+      icon: 'phone',
+    },
+  ],
+};
 
 describe('XmlNodeEditor', () => {
   let fixture: ComponentFixture<XmlNodeEditor>;
@@ -42,9 +71,7 @@ describe('XmlNodeEditor', () => {
     let emitted = null as XmlNode | null;
     component.nodeChange.subscribe((v) => (emitted = v));
 
-    component.updateTagName({
-      target: { value: 'renamed' },
-    } as unknown as Event);
+    component.updateTagName('renamed');
 
     expect(emitted!.tagName).toBe('renamed');
   });
@@ -113,5 +140,85 @@ describe('XmlNodeEditor', () => {
 
     const btn = el.querySelector('.section-action-btn');
     expect(btn).toBeNull();
+  });
+
+  // ── Schema integration ──
+
+  it('should show tag title hint from schema', async () => {
+    fixture.componentRef.setInput('node', createNode('person'));
+    fixture.componentRef.setInput('schema', testSchema);
+    await fixture.whenStable();
+
+    const hint = el.querySelector('.tag-title-hint');
+    expect(hint?.textContent).toContain('Person');
+  });
+
+  it('should show tag description from schema', async () => {
+    fixture.componentRef.setInput('node', createNode('person'));
+    fixture.componentRef.setInput('schema', testSchema);
+    await fixture.whenStable();
+
+    const desc = el.querySelector('.tag-description');
+    expect(desc?.textContent).toContain('Contact entry');
+  });
+
+  it('should show schema icon for tag', async () => {
+    fixture.componentRef.setInput('node', createNode('person'));
+    fixture.componentRef.setInput('schema', testSchema);
+    await fixture.whenStable();
+
+    const icons = el.querySelectorAll('.section-label mat-icon');
+    expect(icons[0]?.textContent?.trim()).toBe('person');
+  });
+
+  it('should filter tag defs by search query', () => {
+    fixture.componentRef.setInput('node', createNode(''));
+    fixture.componentRef.setInput('schema', testSchema);
+
+    // All tags visible
+    expect(component.filteredTagDefs().length).toBe(3);
+
+    // Filter by name
+    component.tagFilter.set('phone');
+    expect(component.filteredTagDefs().length).toBe(1);
+    expect(component.filteredTagDefs()[0].name).toBe('phone');
+  });
+
+  it('should restrict tags by allowedTagNames', () => {
+    fixture.componentRef.setInput('node', createNode(''));
+    fixture.componentRef.setInput('schema', testSchema);
+    fixture.componentRef.setInput('allowedTagNames', [
+      'name',
+      'phone',
+    ]);
+
+    expect(component.availableTagDefs().length).toBe(2);
+    expect(
+      component.availableTagDefs().map((t) => t.name),
+    ).toEqual(['name', 'phone']);
+  });
+
+  it('should provide attribute defs for current tag', () => {
+    fixture.componentRef.setInput('node', createNode('person'));
+    fixture.componentRef.setInput('schema', testSchema);
+
+    expect(component.attrDefs().length).toBe(2);
+    expect(component.attrDefs()[0].name).toBe('id');
+  });
+
+  it('should return empty attrDefs for unknown tag', () => {
+    fixture.componentRef.setInput('node', createNode('unknown'));
+    fixture.componentRef.setInput('schema', testSchema);
+
+    expect(component.attrDefs().length).toBe(0);
+  });
+
+  it('should work without schema (no hint, no autocomplete)', async () => {
+    fixture.componentRef.setInput('node', createNode('test'));
+    await fixture.whenStable();
+
+    expect(el.querySelector('.tag-title-hint')).toBeNull();
+    expect(el.querySelector('.tag-description')).toBeNull();
+    expect(component.filteredTagDefs().length).toBe(0);
   });
 });

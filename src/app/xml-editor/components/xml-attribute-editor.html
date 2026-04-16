@@ -1,0 +1,61 @@
+<div class="attribute-row">
+  <mat-form-field appearance="outline" class="attr-name-field">
+    <mat-label>Name</mat-label>
+    <input
+      matInput
+      [value]="attribute().name"
+      (input)="onNameInput(nameInput.value)"
+      #nameInput
+      [readonly]="readOnly()"
+      spellcheck="false"
+      [matAutocomplete]="attrAuto"
+    />
+    <mat-autocomplete
+      #attrAuto="matAutocomplete"
+      (optionSelected)="onNameSelected($event.option.value)"
+    >
+      @for (def of filteredAttrDefs(); track def.name) {
+        <mat-option [value]="def.name">
+          <div class="ac-option">
+            @if (def.icon) {
+              <mat-icon class="ac-icon">{{ def.icon }}</mat-icon>
+            }
+            <div class="ac-text">
+              <span class="ac-title">{{ def.title ?? def.name }}</span>
+              @if (def.title) {
+                <span class="ac-name">{{ def.name }}</span>
+              }
+              @if (def.description) {
+                <span class="ac-desc">{{ def.description }}</span>
+              }
+            </div>
+          </div>
+        </mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <span class="equals">=</span>
+
+  <mat-form-field appearance="outline" class="attr-value-field">
+    <mat-label>Value</mat-label>
+    <input
+      matInput
+      [value]="attribute().value"
+      (input)="onValueChange(valueInput.value)"
+      #valueInput
+      [readonly]="readOnly()"
+    />
+  </mat-form-field>
+
+  @if (!readOnly()) {
+    <button
+      mat-icon-button
+      (click)="remove.emit()"
+      matTooltip="Remove attribute"
+      class="remove-attr-btn"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  }
+</div>

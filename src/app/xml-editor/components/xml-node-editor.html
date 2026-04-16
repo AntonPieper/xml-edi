@@ -1,18 +1,52 @@
 <!-- Tag Name -->
 <section class="editor-section">
   <div class="section-label">
-    <mat-icon>label</mat-icon>
+    @if (currentTagDef()?.icon) {
+      <mat-icon>{{ currentTagDef()!.icon }}</mat-icon>
+    } @else {
+      <mat-icon>label</mat-icon>
+    }
     <span>Tag Name</span>
+    @if (currentTagDef()?.title) {
+      <span class="tag-title-hint">{{ currentTagDef()!.title }}</span>
+    }
   </div>
+  @if (currentTagDef()?.description) {
+    <p class="tag-description">{{ currentTagDef()!.description }}</p>
+  }
   <mat-form-field appearance="outline" class="full-width">
     <input
       matInput
       [value]="node().tagName"
-      (input)="updateTagName($event)"
+      (input)="onTagInput($event)"
       [readonly]="readOnly()"
       spellcheck="false"
       class="mono-input"
+      [matAutocomplete]="tagAuto"
     />
+    <mat-autocomplete
+      #tagAuto="matAutocomplete"
+      (optionSelected)="onTagSelected($event.option.value)"
+    >
+      @for (tag of filteredTagDefs(); track tag.name) {
+        <mat-option [value]="tag.name">
+          <div class="ac-option">
+            @if (tag.icon) {
+              <mat-icon class="ac-icon">{{ tag.icon }}</mat-icon>
+            }
+            <div class="ac-text">
+              <span class="ac-title">{{ tag.title ?? tag.name }}</span>
+              @if (tag.title) {
+                <span class="ac-name">{{ tag.name }}</span>
+              }
+              @if (tag.description) {
+                <span class="ac-desc">{{ tag.description }}</span>
+              }
+            </div>
+          </div>
+        </mat-option>
+      }
+    </mat-autocomplete>
   </mat-form-field>
 </section>
 
@@ -37,6 +71,7 @@
       <xml-attribute-editor
         [attribute]="attr"
         [readOnly]="readOnly()"
+        [attributeDefs]="attrDefs()"
         (attributeChange)="updateAttribute(attr.id, $event)"
         (remove)="removeAttribute(attr.id)"
       />

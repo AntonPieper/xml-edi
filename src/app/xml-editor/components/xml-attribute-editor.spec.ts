@@ -3,6 +3,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { describe, it, expect, beforeEach } from 'vitest';
 import { XmlAttributeEditor } from './xml-attribute-editor';
 import { createAttribute, resetIdCounter } from '../models/xml-node';
+import type { XmlAttributeDefinition } from '../models/xml-schema';
 
 describe('XmlAttributeEditor', () => {
   let fixture: ComponentFixture<XmlAttributeEditor>;
@@ -51,7 +52,7 @@ describe('XmlAttributeEditor', () => {
     let emitted = null as { name: string; value: string } | null;
     component.attributeChange.subscribe((v) => (emitted = v));
 
-    component.onNameChange('newKey');
+    component.onNameInput('newKey');
 
     expect(emitted!.name).toBe('newKey');
     expect(emitted!.value).toBe('val');
@@ -112,5 +113,41 @@ describe('XmlAttributeEditor', () => {
     btn?.click();
 
     expect(removed).toBe(true);
+  });
+
+  // ── Schema autocomplete ──
+
+  it('should filter attribute defs by query', () => {
+    const defs: XmlAttributeDefinition[] = [
+      { name: 'id', title: 'ID', description: 'Unique identifier' },
+      { name: 'role', title: 'Role', description: 'Contact role' },
+    ];
+    fixture.componentRef.setInput(
+      'attribute',
+      createAttribute('', ''),
+    );
+    fixture.componentRef.setInput('attributeDefs', defs);
+
+    // No filter → all
+    expect(component.filteredAttrDefs().length).toBe(2);
+
+    // Filter by name
+    component.nameFilter.set('role');
+    expect(component.filteredAttrDefs().length).toBe(1);
+    expect(component.filteredAttrDefs()[0].name).toBe('role');
+  });
+
+  it('should emit name via onNameSelected', () => {
+    fixture.componentRef.setInput(
+      'attribute',
+      createAttribute('', 'val'),
+    );
+    let emitted = null as { name: string; value: string } | null;
+    component.attributeChange.subscribe((v) => (emitted = v));
+
+    component.onNameSelected('id');
+
+    expect(emitted!.name).toBe('id');
+    expect(emitted!.value).toBe('val');
   });
 });

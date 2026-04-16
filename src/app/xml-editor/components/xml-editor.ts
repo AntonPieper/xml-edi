@@ -17,6 +17,10 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { XmlNode, createNode } from '../models/xml-node';
 import type { XmlControlMapping } from '../models/xml-editor-config';
 import {
+  type XmlSchemaDefinition,
+  findTagDef,
+} from '../models/xml-schema';
+import {
   updateNodeInTree,
   resolveNodeByPath,
   buildBreadcrumbs,
@@ -45,6 +49,7 @@ export class XmlEditor {
   controls = input<XmlControlMapping[]>([]);
   readOnly = input(false);
   showPreview = input(true);
+  schema = input<XmlSchemaDefinition>();
 
   protected importVisible = signal(false);
   protected importError = signal('');
@@ -82,6 +87,28 @@ export class XmlEditor {
     const crumbs = this.breadcrumbs();
     return crumbs.length >= 2 ? crumbs[crumbs.length - 2].tagName : '';
   });
+
+  /** Current tag's definition from schema */
+  currentTagDef = computed(() =>
+    findTagDef(this.schema(), this.currentNode().tagName),
+  );
+
+  /** Parent tag's definition — used for allowedChildren on current node */
+  parentTagDef = computed(() => {
+    const crumbs = this.breadcrumbs();
+    if (crumbs.length < 2) return undefined;
+    return findTagDef(this.schema(), crumbs[crumbs.length - 2].tagName);
+  });
+
+  /** Tag names the current node is allowed to use (from parent's allowedChildren) */
+  allowedTagNames = computed(
+    () => this.parentTagDef()?.allowedChildren,
+  );
+
+  /** Tag names allowed as children of current node */
+  allowedChildTagNames = computed(
+    () => this.currentTagDef()?.allowedChildren,
+  );
 
   xmlOutput = computed(() => serializeXml(this.document()));
 

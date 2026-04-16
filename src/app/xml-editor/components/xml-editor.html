@@ -72,6 +72,8 @@
           [node]="currentNode()"
           (nodeChange)="updateCurrentNode($event)"
           [readOnly]="readOnly()"
+          [schema]="schema()"
+          [allowedTagNames]="allowedTagNames()"
         />
       </div>
 
@@ -98,6 +100,7 @@
               [child]="child"
               [controls]="controls()"
               [readOnly]="readOnly()"
+              [schema]="schema()"
               (childChange)="updateChildInline(child.id, $event)"
               (navigate)="navigateIntoChild(child.id)"
               (remove)="removeChild(child.id)"

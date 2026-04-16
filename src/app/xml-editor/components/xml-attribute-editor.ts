@@ -3,13 +3,20 @@ import {
   ChangeDetectionStrategy,
   input,
   output,
+  signal,
+  computed,
 } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { XmlAttribute } from '../models/xml-node';
+import {
+  type XmlAttributeDefinition,
+  filterAttrDefs,
+} from '../models/xml-schema';
 
 @Component({
   selector: 'xml-attribute-editor',
@@ -20,105 +27,35 @@ import { XmlAttribute } from '../models/xml-node';
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
+    MatAutocompleteModule,
   ],
-  styles: `
-    :host {
-      display: block;
-    }
-    .attribute-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
-      flex-wrap: wrap;
-    }
-    .attr-name-field {
-      flex: 1 1 120px;
-      min-width: 0;
-    }
-    .attr-value-field {
-      flex: 2 1 150px;
-      min-width: 0;
-    }
-    .equals {
-      font-family: 'IBM Plex Mono', monospace;
-      font-weight: 700;
-      font-size: 1.1em;
-      color: #90a4ae;
-      padding-bottom: 20px;
-    }
-    @media (max-width: 480px) {
-      .equals {
-        display: none;
-      }
-      .attribute-row {
-        gap: 4px;
-      }
-      .remove-attr-btn {
-        margin-bottom: 0;
-        padding-bottom: 0;
-      }
-    }
-    .remove-attr-btn {
-      color: #b0bec5;
-      margin-bottom: 20px;
-      transition: color 0.15s;
-    }
-    .remove-attr-btn:hover {
-      color: #c62828;
-    }
-    input {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.9em;
-    }
-  `,
-  template: `
-    <div class="attribute-row">
-      <mat-form-field appearance="outline" class="attr-name-field">
-        <mat-label>Name</mat-label>
-        <input
-          matInput
-          [value]="attribute().name"
-          (input)="onNameChange(nameInput.value)"
-          #nameInput
-          [readonly]="readOnly()"
-          spellcheck="false"
-        />
-      </mat-form-field>
-
-      <span class="equals">=</span>
-
-      <mat-form-field appearance="outline" class="attr-value-field">
-        <mat-label>Value</mat-label>
-        <input
-          matInput
-          [value]="attribute().value"
-          (input)="onValueChange(valueInput.value)"
-          #valueInput
-          [readonly]="readOnly()"
-        />
-      </mat-form-field>
-
-      @if (!readOnly()) {
-        <button
-          mat-icon-button
-          (click)="remove.emit()"
-          matTooltip="Remove attribute"
-          class="remove-attr-btn"
-        >
-          <mat-icon>close</mat-icon>
-        </button>
-      }
-    </div>
-  `,
+  styleUrl: './xml-attribute-editor.css',
+  templateUrl: './xml-attribute-editor.html',
 })
 export class XmlAttributeEditor {
   attribute = input.required<XmlAttribute>();
   readOnly = input(false);
+  /** Available attribute definitions from schema */
+  attributeDefs = input<XmlAttributeDefinition[]>([]);
   attributeChange = output<{ name: string; value: string }>();
   remove = output<void>();
 
-  onNameChange(name: string) {
+  /** Filter query for autocomplete */
+  nameFilter = signal('');
+
+  filteredAttrDefs = computed(() =>
+    filterAttrDefs(this.attributeDefs(), this.nameFilter()),
+  );
+
+  hasAttrDefs = computed(() => this.attributeDefs().length > 0);
+
+  onNameInput(value: string) {
+    this.nameFilter.set(value);
+    this.attributeChange.emit({ name: value, value: this.attribute().value });
+  }
+
+  onNameSelected(name: string) {
+    this.nameFilter.set(name);
     this.attributeChange.emit({ name, value: this.attribute().value });
   }
 

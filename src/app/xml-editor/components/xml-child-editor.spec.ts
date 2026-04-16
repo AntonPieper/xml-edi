@@ -11,6 +11,7 @@ import {
 import { BooleanControl } from '../controls/boolean-control';
 import { TelephoneControl } from '../controls/telephone-control';
 import type { XmlControlMapping } from '../models/xml-editor-config';
+import type { XmlSchemaDefinition } from '../models/xml-schema';
 
 describe('XmlChildEditor', () => {
   let fixture: ComponentFixture<XmlChildEditor>;
@@ -254,5 +255,100 @@ describe('XmlChildEditor', () => {
     );
     fixture.componentRef.setInput('controls', [boolControl]);
     expect(component.isInline()).toBe(true);
+  });
+
+  // ── Schema metadata ──
+
+  const testSchema: XmlSchemaDefinition = {
+    tags: [
+      {
+        name: 'name',
+        title: 'Full Name',
+        description: "Person's name",
+        icon: 'badge',
+      },
+      {
+        name: 'person',
+        title: 'Person',
+        description: 'Contact entry',
+        icon: 'person',
+      },
+    ],
+  };
+
+  it('should show schema icon for leaf child', async () => {
+    fixture.componentRef.setInput(
+      'child',
+      createNode('name', { textContent: 'Alice' }),
+    );
+    fixture.componentRef.setInput('schema', testSchema);
+    await fixture.whenStable();
+
+    const icon = el.querySelector('.leaf-icon');
+    expect(icon?.textContent?.trim()).toBe('badge');
+  });
+
+  it('should show schema title and tag for leaf', async () => {
+    fixture.componentRef.setInput(
+      'child',
+      createNode('name', { textContent: 'Alice' }),
+    );
+    fixture.componentRef.setInput('schema', testSchema);
+    await fixture.whenStable();
+
+    const title = el.querySelector('.leaf-title');
+    expect(title?.textContent).toContain('Full Name');
+    // Tag name still visible
+    expect(el.querySelector('.leaf-tag')?.textContent).toContain('name');
+  });
+
+  it('should show schema description for leaf', async () => {
+    fixture.componentRef.setInput(
+      'child',
+      createNode('name', { textContent: 'Alice' }),
+    );
+    fixture.componentRef.setInput('schema', testSchema);
+    await fixture.whenStable();
+
+    const desc = el.querySelector('.leaf-desc');
+    expect(desc?.textContent).toContain("Person's name");
+  });
+
+  it('should show schema icon for branch child', async () => {
+    fixture.componentRef.setInput(
+      'child',
+      createNode('person', { children: [createNode('a')] }),
+    );
+    fixture.componentRef.setInput('schema', testSchema);
+    await fixture.whenStable();
+
+    const icon = el.querySelector('.branch-icon');
+    expect(icon?.textContent?.trim()).toBe('person');
+  });
+
+  it('should show schema title for branch', async () => {
+    fixture.componentRef.setInput(
+      'child',
+      createNode('person', { children: [createNode('a')] }),
+    );
+    fixture.componentRef.setInput('schema', testSchema);
+    await fixture.whenStable();
+
+    const title = el.querySelector('.branch-title');
+    expect(title?.textContent).toContain('Person');
+  });
+
+  it('should work without schema (no icon/title/desc)', async () => {
+    fixture.componentRef.setInput(
+      'child',
+      createNode('name', { textContent: 'Alice' }),
+    );
+    await fixture.whenStable();
+
+    expect(el.querySelector('.leaf-icon')).toBeNull();
+    expect(el.querySelector('.leaf-title')).toBeNull();
+    expect(el.querySelector('.leaf-desc')).toBeNull();
+    // Tag shown as primary
+    expect(el.querySelector('.leaf-tag.primary')).toBeTruthy();
   });
 });

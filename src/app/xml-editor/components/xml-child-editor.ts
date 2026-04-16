@@ -13,6 +13,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { XmlNode } from '../models/xml-node';
 import type { XmlControlMapping } from '../models/xml-editor-config';
+import {
+  type XmlSchemaDefinition,
+  findTagDef,
+} from '../models/xml-schema';
 
 @Component({
   selector: 'xml-child-editor',
@@ -32,9 +36,18 @@ export class XmlChildEditor {
   child = input.required<XmlNode>();
   controls = input<XmlControlMapping[]>([]);
   readOnly = input(false);
+  schema = input<XmlSchemaDefinition>();
   childChange = output<XmlNode>();
   navigate = output<void>();
   remove = output<void>();
+
+  /** Tag definition from schema (if available) */
+  tagDef = computed(() =>
+    findTagDef(this.schema(), this.child().tagName),
+  );
+
+  /** Display title: schema title or tag name */
+  displayTitle = computed(() => this.tagDef()?.title ?? null);
 
   /** Leaf node or control says hideChildren → render inline */
   isInline = computed(() => {

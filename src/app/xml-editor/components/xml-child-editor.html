@@ -2,7 +2,15 @@
   <!-- ─── Inline leaf editor ─── -->
   <div class="leaf-child">
     <div class="leaf-header">
-      <span class="leaf-tag">&lt;{{ child().tagName }}&gt;</span>
+      @if (tagDef()?.icon) {
+        <mat-icon class="leaf-icon">{{ tagDef()!.icon }}</mat-icon>
+      }
+      @if (displayTitle()) {
+        <span class="leaf-title">{{ displayTitle() }}</span>
+        <span class="leaf-tag">&lt;{{ child().tagName }}&gt;</span>
+      } @else {
+        <span class="leaf-tag primary">&lt;{{ child().tagName }}&gt;</span>
+      }
       @if (child().attributes.length) {
         <span class="attr-badge">{{ child().attributes.length }} attr</span>
       }
@@ -26,6 +34,9 @@
         </button>
       }
     </div>
+    @if (tagDef()?.description) {
+      <p class="leaf-desc">{{ tagDef()!.description }}</p>
+    }
 
     <div class="leaf-content">
       @if (matchedControl(); as ctrl) {
@@ -55,7 +66,20 @@
     tabindex="0"
     (keydown.enter)="navigate.emit()"
   >
-    <span class="branch-tag">&lt;{{ child().tagName }}&gt;</span>
+    @if (tagDef()?.icon) {
+      <mat-icon class="branch-icon">{{ tagDef()!.icon }}</mat-icon>
+    }
+    <div class="branch-info">
+      @if (displayTitle()) {
+        <span class="branch-title">{{ displayTitle() }}</span>
+        <span class="branch-tag">&lt;{{ child().tagName }}&gt;</span>
+      } @else {
+        <span class="branch-tag primary">&lt;{{ child().tagName }}&gt;</span>
+      }
+      @if (tagDef()?.description) {
+        <span class="branch-desc">{{ tagDef()!.description }}</span>
+      }
+    </div>
     <span class="branch-meta">
       @if (child().textContent) {
         <span class="branch-text">{{ child().textContent }}</span>

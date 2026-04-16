@@ -1,0 +1,104 @@
+:host {
+  display: block;
+}
+
+.attribute-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.attr-name-field {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+
+.attr-value-field {
+  flex: 2 1 150px;
+  min-width: 0;
+}
+
+.equals {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 1.1em;
+  color: #90a4ae;
+  padding-bottom: 20px;
+}
+
+.remove-attr-btn {
+  color: #b0bec5;
+  margin-bottom: 20px;
+  transition: color 0.15s;
+}
+
+.remove-attr-btn:hover {
+  color: #c62828;
+}
+
+input {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.9em;
+}
+
+/* ─── Autocomplete option ─── */
+.ac-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.ac-icon {
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  color: #78909c;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.ac-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.ac-title {
+  font-weight: 600;
+  font-size: 0.88em;
+  color: #37474f;
+}
+
+.ac-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72em;
+  color: #90a4ae;
+}
+
+.ac-desc {
+  font-size: 0.72em;
+  color: #90a4ae;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+
+@media (max-width: 480px) {
+  .equals {
+    display: none;
+  }
+
+  .attribute-row {
+    gap: 4px;
+  }
+
+  .remove-attr-btn {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+}
