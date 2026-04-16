@@ -245,13 +245,12 @@
 .code-editor-section {
   flex-shrink: 0;
   height: 260px;
-  min-height: 120px;
+  min-height: 80px;
   max-height: 80vh;
   border-top: 1px solid #e8ecf0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  resize: vertical;
 }
 
 .code-editor-header {
@@ -267,6 +266,31 @@
   background: #f7f9fb;
   border-bottom: 1px solid #e8ecf0;
   flex-shrink: 0;
+  cursor: row-resize;
+  user-select: none;
+}
+
+.code-editor-header:hover {
+  background: #eceff1;
+}
+
+.code-editor-header:active {
+  background: #e0e4e8;
+}
+
+.drag-grip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0;
+}
+
+.drag-grip span {
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: #cfd8dc;
+  border-radius: 1px;
 }
 
 .code-editor-header mat-icon {

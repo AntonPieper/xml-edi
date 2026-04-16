@@ -111,8 +111,14 @@
     </div>
 
     <!-- Code editor (bottom) -->
-    <div class="code-editor-section">
-      <div class="code-editor-header">
+    <div class="code-editor-section" #codeSection>
+      <div
+        class="code-editor-header"
+        (pointerdown)="onResizeStart($event)"
+      >
+        <div class="drag-grip">
+          <span></span><span></span><span></span>
+        </div>
         <mat-icon>code</mat-icon>
         <span>XML Source</span>
       </div>

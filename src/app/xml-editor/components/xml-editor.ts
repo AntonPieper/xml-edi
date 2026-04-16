@@ -57,6 +57,8 @@ export class XmlEditor {
   protected importError = signal('');
   protected importTextarea =
     viewChild<ElementRef<HTMLTextAreaElement>>('importInput');
+  private codeSection =
+    viewChild<ElementRef<HTMLDivElement>>('codeSection');
 
   /** Path of child IDs from root to current node */
   currentPath = linkedSignal<XmlNode, string[]>({
@@ -110,6 +112,44 @@ export class XmlEditor {
   xmlOutput = computed(() => serializeXml(this.document()));
 
   constructor(private snackBar: MatSnackBar) {}
+
+  // ── Resize code editor ──
+
+  private resizeState: {
+    startY: number;
+    startHeight: number;
+    onMove: (e: PointerEvent) => void;
+    onUp: (e: PointerEvent) => void;
+  } | null = null;
+
+  onResizeStart(event: PointerEvent) {
+    const section = this.codeSection()?.nativeElement;
+    if (!section) return;
+    event.preventDefault();
+
+    const startY = event.clientY;
+    const startHeight = section.offsetHeight;
+
+    const onMove = (e: PointerEvent) => {
+      const delta = startY - e.clientY;
+      const newHeight = Math.max(80, Math.min(startHeight + delta, window.innerHeight * 0.8));
+      section.style.height = `${newHeight}px`;
+    };
+
+    const onUp = (_e: PointerEvent) => {
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+      this.resizeState = null;
+    };
+
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'row-resize';
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+    this.resizeState = { startY, startHeight, onMove, onUp };
+  }
 
   // ── Navigation ──
 

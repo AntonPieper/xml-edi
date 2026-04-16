@@ -4,11 +4,10 @@
 
 .attribute-row {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   gap: 8px;
   margin-bottom: 4px;
   flex-wrap: wrap;
-  overflow: hidden;
 }
 
 .attr-name-field {
@@ -26,12 +25,14 @@
   font-weight: 700;
   font-size: 1.1em;
   color: #90a4ae;
-  margin-top: 16px;
+  align-self: center;
+  padding-bottom: 20px;
 }
 
 .remove-attr-btn {
   color: #b0bec5;
-  margin-top: 8px;
+  align-self: center;
+  padding-bottom: 20px;
   transition: color 0.15s;
 }
 
