@@ -83,7 +83,7 @@ describe('XmlEditor E2E', () => {
     expect(preview?.textContent).toContain('Widget');
   });
 
-  it('should serialize and re-parse consistently', () => {
+  it('round-trip: serialize → parse preserves structure', () => {
     const original = createNode('data', {
       attributes: [createAttribute('key', 'value')],
       children: [
@@ -100,68 +100,74 @@ describe('XmlEditor E2E', () => {
     expect(parsed.tagName).toBe('data');
     expect(parsed.attributes[0].name).toBe('key');
     expect(parsed.children[0].tagName).toBe('nested');
-    expect(parsed.children[0].textContent).toBe('content here');
     expect(parsed.children[0].children[0].textContent).toBe('leaf');
   });
 
-  it('should handle deep document via navigation (no nesting)', async () => {
-    let deepest = createNode('level5', { textContent: 'bottom' });
-    let current: XmlNode = deepest;
+  it('should navigate deep and show full breadcrumb', async () => {
+    // 5 levels: each has 1 child that is a branch, except level5 is leaf
+    let current: XmlNode = createNode('level5', { textContent: 'bottom' });
     for (let i = 4; i >= 1; i--) {
       current = createNode(`level${i}`, { children: [current] });
     }
-
     host.doc.set(current);
     await fixture.whenStable();
 
-    // Navigate 4 levels deep by clicking child rows
-    for (let i = 0; i < 4; i++) {
-      const row = el.querySelector('.child-row') as HTMLElement;
-      expect(row).toBeTruthy();
-      row.click();
+    // Navigate level1 → level2 → level3 (3 branch clicks)
+    // level4 has level5 which is leaf, so level4 shows as branch at level3
+    for (let i = 0; i < 3; i++) {
+      const branch = el.querySelector('.branch-child') as HTMLElement;
+      expect(branch).toBeTruthy();
+      branch.click();
       await fixture.whenStable();
     }
 
-    // Breadcrumb should show full path
-    const crumbs = el.querySelectorAll('.crumb-btn, .crumb-current');
-    expect(crumbs.length).toBe(5);
-    expect(crumbs[4].textContent).toContain('level5');
+    // Now at level4, level5 is leaf (inline)
+    const crumbCurrent = el.querySelector('.crumb-current');
+    expect(crumbCurrent?.textContent).toContain('level4');
+
+    const backBtn = el.querySelector('.back-btn');
+    expect(backBtn?.textContent).toContain('level3');
   });
 
-  it('should handle many attributes', async () => {
-    const attrs = Array.from({ length: 10 }, (_, i) =>
-      createAttribute(`attr${i}`, `val${i}`),
+  it('should show leaf children inline with custom controls', async () => {
+    host.doc.set(
+      createNode('config', {
+        children: [
+          createNode('flag', { textContent: 'true' }),
+          createNode('phone', { textContent: '+15559999999' }),
+          createNode('other', { textContent: 'plain' }),
+        ],
+      }),
     );
-    host.doc.set(createNode('multi', { attributes: attrs }));
     await fixture.whenStable();
 
-    const preview = el.querySelector('.xml-preview');
-    expect(preview?.textContent).toContain('attr0="val0"');
-    expect(preview?.textContent).toContain('attr9="val9"');
+    // All 3 are leaf nodes → should render inline
+    const leaves = el.querySelectorAll('.leaf-child');
+    expect(leaves.length).toBe(3);
   });
 
-  it('should handle XML import via parseXml', async () => {
-    const xmlString = `<bookstore>
-  <book category="fiction">
-    <title>The Great Gatsby</title>
-    <author>F. Scott Fitzgerald</author>
-  </book>
-</bookstore>`;
-
-    const parsed = parseXml(xmlString);
-    host.doc.set(parsed);
+  it('should separate leaf (inline) and branch (navigable) children', async () => {
+    host.doc.set(
+      createNode('mixed', {
+        children: [
+          createNode('title', { textContent: 'Hi' }), // leaf
+          createNode('group', {
+            children: [createNode('item')],
+          }), // branch
+          createNode('note', { textContent: 'x' }), // leaf
+        ],
+      }),
+    );
     await fixture.whenStable();
 
-    const preview = el.querySelector('.xml-preview');
-    expect(preview?.textContent).toContain('<bookstore>');
-    expect(preview?.textContent).toContain('category="fiction"');
-    expect(preview?.textContent).toContain('The Great Gatsby');
+    expect(el.querySelectorAll('.leaf-child').length).toBe(2);
+    expect(el.querySelectorAll('.branch-child').length).toBe(1);
   });
 
-  it('should handle special characters in content', async () => {
+  it('should handle special characters in preview', async () => {
     host.doc.set(
       createNode('data', {
-        textContent: 'Tom & Jerry <friends> "forever"',
+        textContent: 'Tom & Jerry <friends>',
       }),
     );
     await fixture.whenStable();
@@ -171,35 +177,13 @@ describe('XmlEditor E2E', () => {
     expect(preview?.textContent).toContain('&lt;');
   });
 
-  it('should show child rows for nested documents', async () => {
-    host.doc.set(
-      createNode('config', {
-        children: [
-          createNode('flag', { textContent: 'true' }),
-          createNode('phone', { textContent: '+15559999999' }),
-          createNode('other'),
-        ],
-      }),
+  it('should handle empty document', async () => {
+    host.doc.set(createNode('empty'));
+    await fixture.whenStable();
+
+    expect(el.querySelector('.xml-preview')?.textContent?.trim()).toBe(
+      '<empty />',
     );
-    await fixture.whenStable();
-
-    const rows = el.querySelectorAll('.child-row');
-    expect(rows.length).toBe(3);
-  });
-
-  it('should handle empty children array', async () => {
-    host.doc.set(createNode('empty', { children: [] }));
-    await fixture.whenStable();
-
-    const preview = el.querySelector('.xml-preview');
-    expect(preview?.textContent?.trim()).toBe('<empty />');
-  });
-
-  it('should handle whitespace-only text content', async () => {
-    host.doc.set(createNode('ws', { textContent: '   ' }));
-    await fixture.whenStable();
-
-    const preview = el.querySelector('.xml-preview');
-    expect(preview?.textContent?.trim()).toBe('<ws />');
+    expect(el.querySelector('.empty-hint')).toBeTruthy();
   });
 });

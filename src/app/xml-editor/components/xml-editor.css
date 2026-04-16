@@ -25,6 +25,7 @@
   height: 48px;
   border-bottom: 1px solid #e8ecf0;
   background: #f7f9fb;
+  flex-shrink: 0;
 }
 
 .toolbar-logo {
@@ -36,7 +37,6 @@
   font-weight: 700;
   font-size: 0.95em;
   color: #37474f;
-  letter-spacing: 0.01em;
 }
 
 .toolbar-spacer {
@@ -54,6 +54,7 @@
   padding: 16px;
   background: #f5f7f9;
   border-bottom: 1px solid #e8ecf0;
+  flex-shrink: 0;
 }
 
 .import-textarea {
@@ -78,7 +79,7 @@
 .import-error {
   color: #c62828;
   font-size: 0.82em;
-  margin: 6px 0 0 0;
+  margin: 6px 0 0;
 }
 
 .import-actions {
@@ -88,28 +89,73 @@
   margin-top: 10px;
 }
 
-/* ─── Breadcrumb ─── */
-.breadcrumb {
+/* ─── Navigation Bar ─── */
+.nav-bar {
   display: flex;
   align-items: center;
   gap: 2px;
-  padding: 10px 16px;
+  padding: 0 12px;
+  min-height: 44px;
   border-bottom: 1px solid #e8ecf0;
   background: #fafbfc;
   flex-wrap: wrap;
-  min-height: 40px;
+  flex-shrink: 0;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 1px solid #dde1e6;
+  border-radius: 6px;
+  padding: 4px 10px 4px 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82em;
+  font-weight: 500;
+  color: #546e7a;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+
+.back-btn:hover {
+  background: #eceff1;
+  border-color: #b0bec5;
+  color: #37474f;
+}
+
+.back-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.back-label {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-sep {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: #cfd8dc;
 }
 
 .crumb-btn {
   background: none;
   border: none;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.82em;
-  color: #546e7a;
+  font-size: 0.78em;
+  color: #78909c;
   cursor: pointer;
-  padding: 3px 6px;
+  padding: 3px 4px;
   border-radius: 4px;
-  transition: background 0.15s;
+  transition: background 0.12s;
 }
 
 .crumb-btn:hover {
@@ -117,19 +163,12 @@
   color: #37474f;
 }
 
-.crumb-sep {
-  font-size: 16px !important;
-  width: 16px !important;
-  height: 16px !important;
-  color: #b0bec5;
-}
-
 .crumb-current {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.82em;
   font-weight: 600;
   color: #37474f;
-  padding: 3px 6px;
+  padding: 3px 4px;
 }
 
 /* ─── Main Layout ─── */
@@ -170,13 +209,6 @@
   margin-bottom: 10px;
 }
 
-.children-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-  color: #78909c;
-}
-
 .children-label {
   font-size: 0.78em;
   font-weight: 600;
@@ -197,85 +229,6 @@
 .add-child-btn {
   margin-left: auto;
   color: #546e7a !important;
-}
-
-/* ─── Child Rows ─── */
-.child-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid #e8ecf0;
-  border-radius: 6px;
-  margin-bottom: 6px;
-  cursor: pointer;
-  transition:
-    background 0.12s,
-    border-color 0.12s;
-  background: #fafbfc;
-}
-
-.child-row:hover {
-  background: #f0f3f6;
-  border-color: #cfd8dc;
-}
-
-.child-tag {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.88em;
-  font-weight: 600;
-  color: #37474f;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.child-summary {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.child-text {
-  font-size: 0.82em;
-  color: #78909c;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
-}
-
-.child-meta {
-  display: flex;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.meta-pill {
-  font-size: 0.68em;
-  font-weight: 500;
-  color: #90a4ae;
-  background: #eceff1;
-  padding: 2px 6px;
-  border-radius: 8px;
-  white-space: nowrap;
-}
-
-.child-chevron {
-  font-size: 18px !important;
-  width: 18px !important;
-  height: 18px !important;
-  color: #b0bec5;
-  flex-shrink: 0;
-}
-
-.child-delete {
-  flex-shrink: 0;
-  color: #b0bec5 !important;
-  transition: color 0.15s;
-}
-
-.child-delete:hover {
-  color: #c62828 !important;
 }
 
 .empty-hint {
@@ -357,32 +310,28 @@
     font-size: 0.85em;
   }
 
-  .breadcrumb {
-    padding: 8px 10px;
+  .nav-bar {
+    padding: 6px 8px;
+    min-height: 38px;
     gap: 1px;
+  }
+
+  .back-btn {
+    font-size: 0.75em;
+    padding: 3px 8px 3px 4px;
+  }
+
+  .back-label {
+    max-width: 80px;
   }
 
   .crumb-btn,
   .crumb-current {
-    font-size: 0.75em;
-    padding: 2px 4px;
+    font-size: 0.72em;
   }
 
   .node-card {
     padding: 12px;
-  }
-
-  .child-row {
-    padding: 8px 10px;
-    gap: 6px;
-  }
-
-  .child-tag {
-    font-size: 0.82em;
-  }
-
-  .child-meta {
-    display: none;
   }
 
   .xml-preview {

@@ -39,15 +39,23 @@
     </div>
   }
 
-  <!-- ─── Breadcrumb ─── -->
-  <nav class="breadcrumb" aria-label="XML path">
+  <!-- ─── Navigation Bar ─── -->
+  <nav class="nav-bar" aria-label="XML path">
+    @if (!isAtRoot()) {
+      <button class="back-btn" (click)="navigateBack()" matTooltip="Back">
+        <mat-icon>arrow_back</mat-icon>
+        <span class="back-label">{{ parentName() }}</span>
+      </button>
+      <mat-icon class="nav-sep">chevron_right</mat-icon>
+    }
+
+    <!-- Breadcrumb trail -->
     @for (crumb of breadcrumbs(); track crumb.id; let i = $index; let last = $last) {
       @if (!last) {
-        <button
-          class="crumb-btn"
-          (click)="navigateToBreadcrumb(i)"
-        >{{ crumb.tagName }}</button>
-        <mat-icon class="crumb-sep">chevron_right</mat-icon>
+        <button class="crumb-btn" (click)="navigateToBreadcrumb(i)">
+          {{ crumb.tagName }}
+        </button>
+        <mat-icon class="nav-sep">chevron_right</mat-icon>
       } @else {
         <span class="crumb-current">&lt;{{ crumb.tagName }}&gt;</span>
       }
@@ -58,82 +66,47 @@
   <div class="editor-main" [class.with-preview]="showPreview()">
     <div class="editor-panel">
 
-      <!-- Current node editor (custom or default) -->
+      <!-- Current node: tag name + attributes (always default editor) -->
       <div class="node-card">
-        @if (matchedControl(); as ctrl) {
-          <ng-container
-            [ngComponentOutlet]="ctrl.component"
-            [ngComponentOutletInputs]="controlInputs()"
-          />
-        } @else {
-          <xml-node-editor
-            [node]="currentNode()"
-            (nodeChange)="updateCurrentNode($event)"
-            [readOnly]="readOnly()"
-          />
-        }
+        <xml-node-editor
+          [node]="currentNode()"
+          (nodeChange)="updateCurrentNode($event)"
+          [readOnly]="readOnly()"
+        />
       </div>
 
-      <!-- Children list -->
-      @if (!matchedControl()?.hideChildren) {
-        <section class="children-section">
-          <div class="children-header">
-            <mat-icon class="children-icon">account_tree</mat-icon>
-            <span class="children-label">Children</span>
-            <span class="children-count">{{ currentNode().children.length }}</span>
-            @if (!readOnly()) {
-              <button
-                mat-icon-button
-                (click)="addChild()"
-                matTooltip="Add child element"
-                class="add-child-btn"
-              >
-                <mat-icon>add</mat-icon>
-              </button>
-            }
-          </div>
+      <!-- Children: inline for leaves, navigable for branches -->
+      <section class="children-section">
+        <div class="children-header">
+          <span class="children-label">Children</span>
+          <span class="children-count">{{ currentNode().children.length }}</span>
+          @if (!readOnly()) {
+            <button
+              mat-icon-button
+              (click)="addChild()"
+              matTooltip="Add child element"
+              class="add-child-btn"
+            >
+              <mat-icon>add</mat-icon>
+            </button>
+          }
+        </div>
 
-          <div class="children-list">
-            @for (child of currentNode().children; track child.id) {
-              <div
-                class="child-row"
-                (click)="navigateIntoChild(child.id)"
-                role="button"
-                tabindex="0"
-                (keydown.enter)="navigateIntoChild(child.id)"
-              >
-                <span class="child-tag">&lt;{{ child.tagName }}&gt;</span>
-                <span class="child-summary">
-                  @if (child.textContent) {
-                    <span class="child-text">{{ child.textContent }}</span>
-                  }
-                </span>
-                <span class="child-meta">
-                  @if (child.attributes.length) {
-                    <span class="meta-pill">{{ child.attributes.length }} attr</span>
-                  }
-                  @if (child.children.length) {
-                    <span class="meta-pill">{{ child.children.length }} child</span>
-                  }
-                </span>
-                <mat-icon class="child-chevron">chevron_right</mat-icon>
-                @if (!readOnly()) {
-                  <button
-                    mat-icon-button
-                    class="child-delete"
-                    matTooltip="Remove"
-                    (click)="removeChild(child.id, $event)"
-                  >
-                    <mat-icon>close</mat-icon>
-                  </button>
-                }
-              </div>
-            } @empty {
-              <p class="empty-hint">No child elements</p>
-            }
-          </div>
-        </section>
-      }
+        <div class="children-list">
+          @for (child of currentNode().children; track child.id) {
+            <xml-child-editor
+              [child]="child"
+              [controls]="controls()"
+              [readOnly]="readOnly()"
+              (childChange)="updateChildInline(child.id, $event)"
+              (navigate)="navigateIntoChild(child.id)"
+              (remove)="removeChild(child.id)"
+            />
+          } @empty {
+            <p class="empty-hint">No child elements</p>
+          }
+        </div>
+      </section>
     </div>
 
     <!-- Preview -->

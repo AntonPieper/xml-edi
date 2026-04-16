@@ -9,13 +9,11 @@ import {
   linkedSignal,
   ElementRef,
 } from '@angular/core';
-import { NgComponentOutlet } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDividerModule } from '@angular/material/divider';
 import { XmlNode, createNode } from '../models/xml-node';
 import type { XmlControlMapping } from '../models/xml-editor-config';
 import {
@@ -25,6 +23,7 @@ import {
 } from '../models/xml-tree-utils';
 import { serializeXml, parseXml } from '../services/xml-serializer';
 import { XmlNodeEditor } from './xml-node-editor';
+import { XmlChildEditor } from './xml-child-editor';
 
 @Component({
   selector: 'xml-editor',
@@ -33,13 +32,12 @@ import { XmlNodeEditor } from './xml-node-editor';
   styleUrl: './xml-editor.css',
   imports: [
     XmlNodeEditor,
-    NgComponentOutlet,
+    XmlChildEditor,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
     MatSnackBarModule,
-    MatDividerModule,
   ],
 })
 export class XmlEditor {
@@ -53,7 +51,7 @@ export class XmlEditor {
   protected importTextarea =
     viewChild<ElementRef<HTMLTextAreaElement>>('importInput');
 
-  /** Path of child IDs from root to currently viewed node */
+  /** Path of child IDs from root to current node */
   currentPath = linkedSignal<XmlNode, string[]>({
     source: this.document,
     computation: (doc, previous) => {
@@ -78,29 +76,22 @@ export class XmlEditor {
     buildBreadcrumbs(this.document(), this.currentPath()),
   );
 
-  xmlOutput = computed(() => serializeXml(this.document()));
+  isAtRoot = computed(() => this.currentPath().length === 0);
 
-  matchedControl = computed(() => {
-    const n = this.currentNode();
-    for (const ctrl of this.controls()) {
-      if (ctrl.match(n)) return ctrl;
-    }
-    return null;
+  parentName = computed(() => {
+    const crumbs = this.breadcrumbs();
+    return crumbs.length >= 2 ? crumbs[crumbs.length - 2].tagName : '';
   });
 
-  controlInputs = computed(() => ({
-    node: this.currentNode(),
-    readOnly: this.readOnly(),
-    onChange: this.handleControlChange,
-  }));
-
-  readonly handleControlChange = (updated: XmlNode) => {
-    this.updateCurrentNode(updated);
-  };
+  xmlOutput = computed(() => serializeXml(this.document()));
 
   constructor(private snackBar: MatSnackBar) {}
 
   // ── Navigation ──
+
+  navigateBack() {
+    this.currentPath.update((p) => p.slice(0, -1));
+  }
 
   navigateToBreadcrumb(index: number) {
     if (index === 0) {
@@ -114,13 +105,25 @@ export class XmlEditor {
     this.currentPath.update((p) => [...p, childId]);
   }
 
-  // ── Node updates ──
+  // ── Current node updates ──
 
   updateCurrentNode(updated: XmlNode) {
     const nodeId = this.currentNode().id;
     this.document.update((doc) =>
       updateNodeInTree(doc, nodeId, () => updated),
     );
+  }
+
+  // ── Child updates (inline editing) ──
+
+  updateChildInline(childId: string, updated: XmlNode) {
+    const node = this.currentNode();
+    this.updateCurrentNode({
+      ...node,
+      children: node.children.map((c) =>
+        c.id === childId ? updated : c,
+      ),
+    });
   }
 
   addChild() {
@@ -131,8 +134,7 @@ export class XmlEditor {
     });
   }
 
-  removeChild(childId: string, event: MouseEvent) {
-    event.stopPropagation();
+  removeChild(childId: string) {
     const node = this.currentNode();
     this.updateCurrentNode({
       ...node,

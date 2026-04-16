@@ -11,6 +11,7 @@ export { serializeXml, parseXml } from './services/xml-serializer';
 // Components
 export { XmlEditor } from './components/xml-editor';
 export { XmlNodeEditor } from './components/xml-node-editor';
+export { XmlChildEditor } from './components/xml-child-editor';
 export { XmlAttributeEditor } from './components/xml-attribute-editor';
 
 // Controls

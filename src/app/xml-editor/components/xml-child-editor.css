@@ -1,0 +1,158 @@
+:host {
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ─── Leaf (inline editable) ─── */
+.leaf-child {
+  border: 1px solid #e8ecf0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #ffffff;
+  transition: border-color 0.12s;
+}
+
+.leaf-child:focus-within {
+  border-color: #90a4ae;
+}
+
+.leaf-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.leaf-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82em;
+  font-weight: 600;
+  color: #546e7a;
+}
+
+.attr-badge {
+  font-size: 0.68em;
+  font-weight: 500;
+  color: #90a4ae;
+  background: #eceff1;
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+.leaf-spacer {
+  flex: 1;
+}
+
+.detail-btn {
+  color: #90a4ae !important;
+  transition: color 0.12s;
+}
+
+.detail-btn:hover {
+  color: #546e7a !important;
+}
+
+.leaf-content {
+  padding-left: 2px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* ─── Branch (navigable) ─── */
+.branch-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #e8ecf0;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #fafbfc;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+
+.branch-child:hover {
+  background: #f0f3f6;
+  border-color: #cfd8dc;
+}
+
+.branch-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.88em;
+  font-weight: 600;
+  color: #37474f;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.branch-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.branch-text {
+  font-size: 0.82em;
+  color: #78909c;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta-pill {
+  font-size: 0.68em;
+  font-weight: 500;
+  color: #90a4ae;
+  background: #eceff1;
+  padding: 2px 7px;
+  border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.branch-chevron {
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  color: #b0bec5;
+  flex-shrink: 0;
+}
+
+/* ─── Shared ─── */
+.remove-btn {
+  flex-shrink: 0;
+  color: #b0bec5 !important;
+  transition: color 0.12s;
+}
+
+.remove-btn:hover {
+  color: #c62828 !important;
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 600px) {
+  .leaf-child {
+    padding: 8px 10px;
+  }
+
+  .branch-child {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .leaf-tag,
+  .branch-tag {
+    font-size: 0.78em;
+  }
+
+  .meta-pill {
+    font-size: 0.62em;
+  }
+}

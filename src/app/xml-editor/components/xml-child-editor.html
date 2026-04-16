@@ -1,0 +1,80 @@
+@if (isInline()) {
+  <!-- ─── Inline leaf editor ─── -->
+  <div class="leaf-child">
+    <div class="leaf-header">
+      <span class="leaf-tag">&lt;{{ child().tagName }}&gt;</span>
+      @if (child().attributes.length) {
+        <span class="attr-badge">{{ child().attributes.length }} attr</span>
+      }
+      <span class="leaf-spacer"></span>
+      <button
+        mat-icon-button
+        (click)="navigate.emit()"
+        matTooltip="Edit tag name & attributes"
+        class="detail-btn"
+      >
+        <mat-icon>edit_note</mat-icon>
+      </button>
+      @if (!readOnly()) {
+        <button
+          mat-icon-button
+          (click)="remove.emit()"
+          matTooltip="Remove element"
+          class="remove-btn"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+
+    <div class="leaf-content">
+      @if (matchedControl(); as ctrl) {
+        <ng-container
+          [ngComponentOutlet]="ctrl.component"
+          [ngComponentOutletInputs]="controlInputs()"
+        />
+      } @else {
+        <mat-form-field appearance="outline" class="full-width">
+          <input
+            matInput
+            [value]="child().textContent"
+            (input)="updateContent($event)"
+            [readonly]="readOnly()"
+            placeholder="Text content…"
+          />
+        </mat-form-field>
+      }
+    </div>
+  </div>
+} @else {
+  <!-- ─── Branch node (navigable) ─── -->
+  <div
+    class="branch-child"
+    (click)="navigate.emit()"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="navigate.emit()"
+  >
+    <span class="branch-tag">&lt;{{ child().tagName }}&gt;</span>
+    <span class="branch-meta">
+      @if (child().textContent) {
+        <span class="branch-text">{{ child().textContent }}</span>
+      }
+      <span class="meta-pill">{{ child().children.length }} children</span>
+      @if (child().attributes.length) {
+        <span class="meta-pill">{{ child().attributes.length }} attr</span>
+      }
+    </span>
+    <mat-icon class="branch-chevron">chevron_right</mat-icon>
+    @if (!readOnly()) {
+      <button
+        mat-icon-button
+        (click)="remove.emit(); $event.stopPropagation()"
+        matTooltip="Remove element"
+        class="remove-btn"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    }
+  </div>
+}

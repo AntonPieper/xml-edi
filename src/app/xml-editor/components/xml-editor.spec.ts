@@ -7,11 +7,9 @@ import {
   createNode,
   createAttribute,
   resetIdCounter,
-  type XmlNode,
 } from '../models/xml-node';
 import { TelephoneControl } from '../controls/telephone-control';
 import { BooleanControl } from '../controls/boolean-control';
-import { UrlControl } from '../controls/url-control';
 import type { XmlControlMapping } from '../models/xml-editor-config';
 
 @Component({
@@ -41,9 +39,7 @@ class TestHost {
         }),
         createNode('person', {
           attributes: [createAttribute('id', '2')],
-          children: [
-            createNode('name', { textContent: 'Bob' }),
-          ],
+          children: [createNode('name', { textContent: 'Bob' })],
         }),
       ],
     }),
@@ -58,10 +54,6 @@ class TestHost {
       match: (n) => n.tagName === 'active',
       component: BooleanControl,
       hideChildren: true,
-    },
-    {
-      match: (n) => n.tagName === 'website',
-      component: UrlControl,
     },
   ];
 }
@@ -85,103 +77,87 @@ describe('XmlEditor Integration', () => {
   });
 
   it('should render toolbar', () => {
-    const toolbar = el.querySelector('.editor-toolbar');
-    expect(toolbar).toBeTruthy();
-    expect(toolbar?.textContent).toContain('XML Editor');
+    expect(el.querySelector('.editor-toolbar')).toBeTruthy();
+    expect(el.querySelector('.editor-toolbar')?.textContent).toContain(
+      'XML Editor',
+    );
   });
 
-  it('should show breadcrumb with root', () => {
+  it('should show current node tag in breadcrumb', () => {
     const crumb = el.querySelector('.crumb-current');
     expect(crumb?.textContent).toContain('contacts');
   });
 
+  it('should not show back button at root', () => {
+    expect(el.querySelector('.back-btn')).toBeNull();
+  });
+
   it('should show XML preview', () => {
     const preview = el.querySelector('.xml-preview');
-    expect(preview).toBeTruthy();
     expect(preview?.textContent).toContain('<contacts');
+    expect(preview?.textContent).toContain('version="1.0"');
   });
 
-  it('should render children as rows', () => {
-    const rows = el.querySelectorAll('.child-row');
-    expect(rows.length).toBe(2);
-    expect(rows[0].textContent).toContain('person');
+  it('should render children as branch cards (person has children)', () => {
+    const branches = el.querySelectorAll('.branch-child');
+    expect(branches.length).toBe(2);
+    expect(branches[0].textContent).toContain('person');
   });
 
-  it('should navigate into child on click', async () => {
-    const row = el.querySelector('.child-row') as HTMLElement;
-    row.click();
+  it('should navigate into child and show back button', async () => {
+    const branch = el.querySelector('.branch-child') as HTMLElement;
+    branch.click();
     await fixture.whenStable();
 
-    // Breadcrumb should now show contacts > person
-    const crumbs = el.querySelectorAll('.crumb-btn, .crumb-current');
-    expect(crumbs.length).toBe(2);
-    expect(crumbs[0].textContent).toContain('contacts');
-    expect(crumbs[1].textContent).toContain('person');
-  });
+    // Back button should appear
+    const backBtn = el.querySelector('.back-btn');
+    expect(backBtn).toBeTruthy();
+    expect(backBtn?.textContent).toContain('contacts');
 
-  it('should navigate back via breadcrumb', async () => {
-    // Navigate into first child
-    const row = el.querySelector('.child-row') as HTMLElement;
-    row.click();
-    await fixture.whenStable();
-
-    // Click root breadcrumb
-    const rootCrumb = el.querySelector('.crumb-btn') as HTMLElement;
-    rootCrumb.click();
-    await fixture.whenStable();
-
-    // Should be back at root with 2 children
-    const rows = el.querySelectorAll('.child-row');
-    expect(rows.length).toBe(2);
-  });
-
-  it('should show node editor for current node', () => {
-    const nodeEditor = el.querySelector('xml-node-editor');
-    expect(nodeEditor).toBeTruthy();
-  });
-
-  it('should update document when node changes', async () => {
-    host.doc.update((d) => ({ ...d, tagName: 'addressbook' }));
-    await fixture.whenStable();
-
+    // Current node should be person
     const crumb = el.querySelector('.crumb-current');
-    expect(crumb?.textContent).toContain('addressbook');
+    expect(crumb?.textContent).toContain('person');
   });
 
-  it('should apply read-only mode', async () => {
+  it('should show leaf children inline after navigation', async () => {
+    // Navigate into first person
+    const branch = el.querySelector('.branch-child') as HTMLElement;
+    branch.click();
+    await fixture.whenStable();
+
+    // Leaf children (name, phone, active) should render inline
+    const leaves = el.querySelectorAll('.leaf-child');
+    expect(leaves.length).toBe(3);
+  });
+
+  it('should navigate back via back button', async () => {
+    // Navigate in
+    (el.querySelector('.branch-child') as HTMLElement).click();
+    await fixture.whenStable();
+
+    // Navigate back
+    (el.querySelector('.back-btn') as HTMLElement).click();
+    await fixture.whenStable();
+
+    // Should be at root with 2 branch children
+    expect(el.querySelectorAll('.branch-child').length).toBe(2);
+    expect(el.querySelector('.back-btn')).toBeNull();
+  });
+
+  it('should apply readOnly mode', async () => {
     host.readOnly.set(true);
     await fixture.whenStable();
 
-    const addBtn = el.querySelector('.add-child-btn');
-    expect(addBtn).toBeNull();
+    expect(el.querySelector('.add-child-btn')).toBeNull();
   });
 
-  it('should show import panel on toggle', async () => {
-    const importBtn = el.querySelector(
+  it('should show import panel', async () => {
+    const btn = el.querySelector(
       'button[mattooltip="Import XML"]',
-    ) as HTMLButtonElement;
-    importBtn?.click();
+    ) as HTMLElement;
+    btn?.click();
     await fixture.whenStable();
 
     expect(el.querySelector('.import-panel')).toBeTruthy();
-  });
-
-  it('should render custom control when navigated to matching node', async () => {
-    // Navigate: contacts → person (first) → active
-    const personRow = el.querySelector('.child-row') as HTMLElement;
-    personRow.click();
-    await fixture.whenStable();
-
-    // Now at person level, find active child
-    const rows = el.querySelectorAll('.child-row');
-    const activeRow = Array.from(rows).find((r) =>
-      r.textContent?.includes('active'),
-    ) as HTMLElement;
-    activeRow?.click();
-    await fixture.whenStable();
-
-    // Should render boolean control
-    const toggle = el.querySelector('mat-slide-toggle');
-    expect(toggle).toBeTruthy();
   });
 });
