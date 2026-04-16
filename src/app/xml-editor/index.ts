@@ -2,7 +2,8 @@
 export type { XmlNode, XmlAttribute } from './models/xml-node';
 export { createNode, createAttribute, generateId, resetIdCounter } from './models/xml-node';
 export type { XmlControlMapping } from './models/xml-editor-config';
-export { updateNodeInTree, removeNodeFromTree, addChildToNode, findNodeById, countNodes } from './models/xml-tree-utils';
+export type { BreadcrumbItem } from './models/xml-tree-utils';
+export { updateNodeInTree, removeNodeFromTree, addChildToNode, findNodeById, countNodes, resolveNodeByPath, buildBreadcrumbs } from './models/xml-tree-utils';
 
 // Services
 export { serializeXml, parseXml } from './services/xml-serializer';

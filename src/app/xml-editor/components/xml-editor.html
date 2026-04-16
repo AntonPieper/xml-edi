@@ -1,16 +1,15 @@
 <div class="xml-editor-container">
   <!-- ─── Toolbar ─── -->
-  <mat-toolbar class="editor-toolbar">
+  <header class="editor-toolbar">
     <mat-icon class="toolbar-logo">data_object</mat-icon>
     <span class="toolbar-title">XML Editor</span>
     <span class="toolbar-spacer"></span>
-
     @if (!readOnly()) {
       <button
         mat-icon-button
         matTooltip="Import XML"
         (click)="toggleImport()"
-        [class.active-btn]="importVisible()"
+        [class.active-action]="importVisible()"
       >
         <mat-icon>upload_file</mat-icon>
       </button>
@@ -18,17 +17,16 @@
     <button mat-icon-button matTooltip="Copy XML" (click)="copyXml()">
       <mat-icon>content_copy</mat-icon>
     </button>
-  </mat-toolbar>
+  </header>
 
-  <!-- ─── Import Panel ─── -->
+  <!-- ─── Import ─── -->
   @if (importVisible()) {
     <div class="import-panel">
-      <h3 class="import-title">Import XML</h3>
       <textarea
         #importInput
         class="import-textarea"
-        rows="8"
-        placeholder="Paste your XML here..."
+        rows="6"
+        placeholder="Paste XML here…"
         spellcheck="false"
       ></textarea>
       @if (importError()) {
@@ -41,29 +39,112 @@
     </div>
   }
 
-  <!-- ─── Main Content ─── -->
+  <!-- ─── Breadcrumb ─── -->
+  <nav class="breadcrumb" aria-label="XML path">
+    @for (crumb of breadcrumbs(); track crumb.id; let i = $index; let last = $last) {
+      @if (!last) {
+        <button
+          class="crumb-btn"
+          (click)="navigateToBreadcrumb(i)"
+        >{{ crumb.tagName }}</button>
+        <mat-icon class="crumb-sep">chevron_right</mat-icon>
+      } @else {
+        <span class="crumb-current">&lt;{{ crumb.tagName }}&gt;</span>
+      }
+    }
+  </nav>
+
+  <!-- ─── Main ─── -->
   <div class="editor-main" [class.with-preview]="showPreview()">
-    <!-- Editor Panel -->
     <div class="editor-panel">
-      <xml-node-editor
-        [node]="document()"
-        (nodeChange)="onDocumentChange($event)"
-        [controls]="controls()"
-        [readOnly]="readOnly()"
-        [depth]="0"
-        [removable]="false"
-      />
+
+      <!-- Current node editor (custom or default) -->
+      <div class="node-card">
+        @if (matchedControl(); as ctrl) {
+          <ng-container
+            [ngComponentOutlet]="ctrl.component"
+            [ngComponentOutletInputs]="controlInputs()"
+          />
+        } @else {
+          <xml-node-editor
+            [node]="currentNode()"
+            (nodeChange)="updateCurrentNode($event)"
+            [readOnly]="readOnly()"
+          />
+        }
+      </div>
+
+      <!-- Children list -->
+      @if (!matchedControl()?.hideChildren) {
+        <section class="children-section">
+          <div class="children-header">
+            <mat-icon class="children-icon">account_tree</mat-icon>
+            <span class="children-label">Children</span>
+            <span class="children-count">{{ currentNode().children.length }}</span>
+            @if (!readOnly()) {
+              <button
+                mat-icon-button
+                (click)="addChild()"
+                matTooltip="Add child element"
+                class="add-child-btn"
+              >
+                <mat-icon>add</mat-icon>
+              </button>
+            }
+          </div>
+
+          <div class="children-list">
+            @for (child of currentNode().children; track child.id) {
+              <div
+                class="child-row"
+                (click)="navigateIntoChild(child.id)"
+                role="button"
+                tabindex="0"
+                (keydown.enter)="navigateIntoChild(child.id)"
+              >
+                <span class="child-tag">&lt;{{ child.tagName }}&gt;</span>
+                <span class="child-summary">
+                  @if (child.textContent) {
+                    <span class="child-text">{{ child.textContent }}</span>
+                  }
+                </span>
+                <span class="child-meta">
+                  @if (child.attributes.length) {
+                    <span class="meta-pill">{{ child.attributes.length }} attr</span>
+                  }
+                  @if (child.children.length) {
+                    <span class="meta-pill">{{ child.children.length }} child</span>
+                  }
+                </span>
+                <mat-icon class="child-chevron">chevron_right</mat-icon>
+                @if (!readOnly()) {
+                  <button
+                    mat-icon-button
+                    class="child-delete"
+                    matTooltip="Remove"
+                    (click)="removeChild(child.id, $event)"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
+                }
+              </div>
+            } @empty {
+              <p class="empty-hint">No child elements</p>
+            }
+          </div>
+        </section>
+      }
     </div>
 
-    <!-- Preview Panel -->
+    <!-- Preview -->
     @if (showPreview()) {
-      <div class="preview-panel">
+      <aside class="preview-panel">
         <div class="preview-header">
           <mat-icon>code</mat-icon>
           <span>XML Output</span>
         </div>
         <pre class="xml-preview"><code>{{ xmlOutput() }}</code></pre>
-      </div>
+      </aside>
     }
   </div>
 </div>

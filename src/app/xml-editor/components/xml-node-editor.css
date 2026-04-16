@@ -1,105 +1,40 @@
 :host {
   display: block;
-  margin-bottom: 8px;
 }
 
-/* ─── Panel ─── */
-.node-panel {
-  border-left: 3px solid var(--depth-color, #00bcd4);
-  border-radius: 8px !important;
-  overflow: hidden;
-}
-
-:host-context(xml-node-editor xml-node-editor) .node-panel {
-  border-radius: 6px !important;
-}
-
-/* ─── Header ─── */
-.tag-badge {
-  display: inline-flex;
-  align-items: center;
-  font-family: 'Fira Code', monospace;
-  font-size: 0.85em;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 12px;
-  color: #fff;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.meta-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 0.8em;
-  padding: 2px 8px;
-  border-radius: 10px;
-  margin-left: 6px;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.meta-chip .chip-icon {
-  font-size: 14px;
-  width: 14px;
-  height: 14px;
-}
-
-.attr-chip {
-  color: #ffa726;
-}
-.child-chip {
-  color: #66bb6a;
-}
-.text-chip {
-  color: #90caf9;
-}
-
-/* ─── Body ─── */
-.node-body {
-  padding: 8px 0;
-}
-
-/* ─── Sections ─── */
 .editor-section {
-  padding: 8px 0;
+  margin-bottom: 4px;
 }
 
 .section-label {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.82em;
-  font-weight: 500;
+  font-size: 0.78em;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  opacity: 0.7;
+  letter-spacing: 0.06em;
+  color: #78909c;
   margin-bottom: 8px;
 }
 
 .section-label mat-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 .section-action-btn {
   margin-left: auto;
-  color: var(--depth-color, #00bcd4) !important;
+  color: #546e7a !important;
 }
 
-.section-action-btn mat-icon {
-  font-size: 20px;
-}
-
-/* ─── Form fields ─── */
 .full-width {
   width: 100%;
 }
 
 .mono-input {
-  font-family: 'Fira Code', monospace;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.95em;
 }
 
@@ -108,82 +43,22 @@
   line-height: 1.5;
 }
 
-/* ─── Hints ─── */
 .empty-hint {
   font-size: 0.82em;
-  opacity: 0.45;
+  color: #b0bec5;
   font-style: italic;
   padding: 4px 0;
   margin: 0;
 }
 
-/* ─── Children ─── */
-.children-list {
-  padding-left: 0;
-}
-
-/* ─── Remove ─── */
-.remove-section {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 8px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.1);
-  margin-top: 8px;
-}
-
-.remove-btn {
-  color: #ef5350 !important;
-  font-size: 0.85em;
-}
-
-.remove-btn mat-icon {
-  font-size: 18px;
-  margin-right: 4px;
-}
-
-/* ─── Attribute list ─── */
 .attributes-list {
   max-height: 400px;
   overflow-y: auto;
 }
 
-/* ─── Mobile ─── */
 @media (max-width: 600px) {
-  :host {
-    margin-bottom: 4px;
-  }
-
-  .node-body {
-    padding: 4px 0;
-  }
-
-  .editor-section {
-    padding: 4px 0;
-  }
-
-  .tag-badge {
-    font-size: 0.78em;
-    padding: 2px 7px;
-  }
-
-  .meta-chip {
-    font-size: 0.72em;
-    padding: 1px 5px;
-    margin-left: 4px;
-  }
-
   .section-label {
-    font-size: 0.75em;
+    font-size: 0.72em;
     gap: 4px;
-  }
-
-  .section-label mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-
-  .remove-btn {
-    font-size: 0.78em;
   }
 }

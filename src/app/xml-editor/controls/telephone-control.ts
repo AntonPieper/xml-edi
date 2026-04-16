@@ -14,29 +14,26 @@ import { XmlNode } from '../models/xml-node';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatFormFieldModule, MatInputModule, MatIconModule],
   styles: `
-    :host {
-      display: block;
-      padding: 8px 0;
-    }
+    :host { display: block; padding: 8px 0; }
     .telephone-control {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
     .phone-icon {
-      color: #4caf50;
-      font-size: 32px;
-      width: 32px;
-      height: 32px;
+      color: #546e7a;
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
     }
-    .phone-field {
-      flex: 1;
-    }
+    .phone-field { flex: 1; }
     .phone-preview {
-      font-family: 'Fira Code', monospace;
-      font-size: 1.1em;
-      letter-spacing: 0.05em;
-      color: #a5d6a7;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.92em;
+      letter-spacing: 0.04em;
+      color: #37474f;
+      margin-top: 4px;
+      padding-left: 42px;
     }
   `,
   template: `

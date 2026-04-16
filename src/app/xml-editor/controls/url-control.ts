@@ -22,34 +22,20 @@ import { XmlNode } from '../models/xml-node';
     MatTooltipModule,
   ],
   styles: `
-    :host {
-      display: block;
-      padding: 8px 0;
-    }
+    :host { display: block; padding: 8px 0; }
     .url-control {
       display: flex;
       align-items: center;
       gap: 12px;
     }
     .url-icon {
-      color: #42a5f5;
-      font-size: 28px;
-      width: 28px;
-      height: 28px;
+      color: #546e7a;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
     }
-    .url-field {
-      flex: 1;
-    }
-    .open-btn {
-      color: #42a5f5;
-    }
-    .url-preview {
-      margin-top: 4px;
-      font-family: 'Fira Code', monospace;
-      font-size: 0.85em;
-      color: #64b5f6;
-      word-break: break-all;
-    }
+    .url-field { flex: 1; }
+    .open-btn { color: #546e7a; }
   `,
   template: `
     <div class="url-control">

@@ -10,6 +10,8 @@ import {
   addChildToNode,
   findNodeById,
   countNodes,
+  resolveNodeByPath,
+  buildBreadcrumbs,
 } from './xml-tree-utils';
 
 // re-export moved file
@@ -162,7 +164,6 @@ describe('XmlTreeUtils', () => {
 
   describe('countNodes', () => {
     it('should count all nodes in tree', () => {
-      // root(1) + child1(1) + grandchild(1) + child2(1) = 4
       expect(countNodes(root)).toBe(4);
     });
 
@@ -177,6 +178,64 @@ describe('XmlTreeUtils', () => {
         createNode('extra'),
       );
       expect(countNodes(updated)).toBe(5);
+    });
+  });
+
+  describe('resolveNodeByPath', () => {
+    it('should return root for empty path', () => {
+      const node = resolveNodeByPath(root, []);
+      expect(node).toBe(root);
+    });
+
+    it('should resolve direct child', () => {
+      const node = resolveNodeByPath(root, [root.children[0].id]);
+      expect(node.tagName).toBe('child1');
+    });
+
+    it('should resolve deeply nested node', () => {
+      const gcId = root.children[0].children[0].id;
+      const node = resolveNodeByPath(root, [
+        root.children[0].id,
+        gcId,
+      ]);
+      expect(node.tagName).toBe('grandchild');
+    });
+
+    it('should return deepest valid node for broken path', () => {
+      const node = resolveNodeByPath(root, [
+        root.children[0].id,
+        'nonexistent',
+      ]);
+      expect(node.tagName).toBe('child1');
+    });
+  });
+
+  describe('buildBreadcrumbs', () => {
+    it('should return root only for empty path', () => {
+      const crumbs = buildBreadcrumbs(root, []);
+      expect(crumbs).toHaveLength(1);
+      expect(crumbs[0].tagName).toBe('root');
+    });
+
+    it('should build full breadcrumb trail', () => {
+      const gcId = root.children[0].children[0].id;
+      const crumbs = buildBreadcrumbs(root, [
+        root.children[0].id,
+        gcId,
+      ]);
+      expect(crumbs).toHaveLength(3);
+      expect(crumbs[0].tagName).toBe('root');
+      expect(crumbs[1].tagName).toBe('child1');
+      expect(crumbs[2].tagName).toBe('grandchild');
+    });
+
+    it('should truncate at broken path step', () => {
+      const crumbs = buildBreadcrumbs(root, [
+        root.children[0].id,
+        'invalid',
+      ]);
+      expect(crumbs).toHaveLength(2);
+      expect(crumbs[1].tagName).toBe('child1');
     });
   });
 });

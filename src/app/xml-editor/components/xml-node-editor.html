@@ -1,161 +1,65 @@
-<mat-expansion-panel
-  class="node-panel"
-  [style.--depth-color]="depthColor()"
->
-  <!-- ─── Header ─── -->
-  <mat-expansion-panel-header>
-    <mat-panel-title>
-      <span class="tag-badge" [style.background-color]="depthColor()">
-        &lt;{{ node().tagName }}&gt;
-      </span>
-    </mat-panel-title>
-    <mat-panel-description>
-      @if (node().attributes.length) {
-        <span class="meta-chip attr-chip">
-          <mat-icon class="chip-icon">tune</mat-icon>
-          {{ node().attributes.length }}
-        </span>
-      }
-      @if (node().children.length) {
-        <span class="meta-chip child-chip">
-          <mat-icon class="chip-icon">account_tree</mat-icon>
-          {{ node().children.length }}
-        </span>
-      }
-      @if (node().textContent) {
-        <span class="meta-chip text-chip">
-          <mat-icon class="chip-icon">notes</mat-icon>
-        </span>
-      }
-    </mat-panel-description>
-  </mat-expansion-panel-header>
+<!-- Tag Name -->
+<section class="editor-section">
+  <div class="section-label">
+    <mat-icon>label</mat-icon>
+    <span>Tag Name</span>
+  </div>
+  <mat-form-field appearance="outline" class="full-width">
+    <input
+      matInput
+      [value]="node().tagName"
+      (input)="updateTagName($event)"
+      [readonly]="readOnly()"
+      spellcheck="false"
+      class="mono-input"
+    />
+  </mat-form-field>
+</section>
 
-  <!-- ─── Body ─── -->
-  <div class="node-body">
-    @if (matchedControl(); as ctrl) {
-      <!-- Custom control -->
-      <ng-container
-        [ngComponentOutlet]="ctrl.component"
-        [ngComponentOutletInputs]="controlInputs()"
-      />
-    } @else {
-      <!-- Tag Name -->
-      <section class="editor-section">
-        <div class="section-label">
-          <mat-icon>label</mat-icon>
-          <span>Tag Name</span>
-        </div>
-        <mat-form-field appearance="outline" class="full-width">
-          <input
-            matInput
-            [value]="node().tagName"
-            (input)="updateTagName($event)"
-            [readonly]="readOnly()"
-            spellcheck="false"
-            class="mono-input"
-          />
-        </mat-form-field>
-      </section>
-
-      <!-- Attributes -->
-      <section class="editor-section">
-        <div class="section-label">
-          <mat-icon>tune</mat-icon>
-          <span>Attributes</span>
-          @if (!readOnly()) {
-            <button
-              mat-icon-button
-              (click)="addAttribute()"
-              matTooltip="Add attribute"
-              class="section-action-btn"
-            >
-              <mat-icon>add_circle_outline</mat-icon>
-            </button>
-          }
-        </div>
-        <div class="attributes-list">
-          @for (attr of node().attributes; track attr.id) {
-            <xml-attribute-editor
-              [attribute]="attr"
-              [readOnly]="readOnly()"
-              (attributeChange)="updateAttribute(attr.id, $event)"
-              (remove)="removeAttribute(attr.id)"
-            />
-          } @empty {
-            <p class="empty-hint">No attributes defined</p>
-          }
-        </div>
-      </section>
-
-      <mat-divider />
-
-      <!-- Text Content -->
-      <section class="editor-section">
-        <div class="section-label">
-          <mat-icon>notes</mat-icon>
-          <span>Text Content</span>
-        </div>
-        <mat-form-field appearance="outline" class="full-width">
-          <textarea
-            matInput
-            [value]="node().textContent"
-            (input)="updateTextContent($event)"
-            [readonly]="readOnly()"
-            rows="2"
-            class="content-input"
-          ></textarea>
-        </mat-form-field>
-      </section>
-    }
-
-    <!-- Children (always shown unless custom control hides them) -->
-    @if (!matchedControl()?.hideChildren) {
-      <mat-divider />
-      <section class="editor-section children-section">
-        <div class="section-label">
-          <mat-icon>account_tree</mat-icon>
-          <span>Children</span>
-          @if (!readOnly()) {
-            <button
-              mat-icon-button
-              (click)="addChild()"
-              matTooltip="Add child element"
-              class="section-action-btn"
-            >
-              <mat-icon>add_circle_outline</mat-icon>
-            </button>
-          }
-        </div>
-        <div class="children-list">
-          @for (child of node().children; track child.id; let i = $index) {
-            <xml-node-editor
-              [node]="child"
-              (nodeChange)="onChildChange(i, $event)"
-              [controls]="controls()"
-              [readOnly]="readOnly()"
-              [depth]="depth() + 1"
-              [removable]="!readOnly()"
-              (removeNode)="onChildRemove(i)"
-            />
-          } @empty {
-            <p class="empty-hint">No child elements</p>
-          }
-        </div>
-      </section>
-    }
-
-    <!-- Remove button -->
-    @if (removable() && !readOnly()) {
-      <div class="remove-section">
-        <button
-          mat-button
-          (click)="removeNode.emit()"
-          class="remove-btn"
-        >
-          <mat-icon>delete_outline</mat-icon>
-          Remove Element
-        </button>
-      </div>
+<!-- Attributes -->
+<section class="editor-section">
+  <div class="section-label">
+    <mat-icon>tune</mat-icon>
+    <span>Attributes</span>
+    @if (!readOnly()) {
+      <button
+        mat-icon-button
+        (click)="addAttribute()"
+        matTooltip="Add attribute"
+        class="section-action-btn"
+      >
+        <mat-icon>add_circle_outline</mat-icon>
+      </button>
     }
   </div>
-</mat-expansion-panel>
+  <div class="attributes-list">
+    @for (attr of node().attributes; track attr.id) {
+      <xml-attribute-editor
+        [attribute]="attr"
+        [readOnly]="readOnly()"
+        (attributeChange)="updateAttribute(attr.id, $event)"
+        (remove)="removeAttribute(attr.id)"
+      />
+    } @empty {
+      <p class="empty-hint">No attributes</p>
+    }
+  </div>
+</section>
+
+<!-- Text Content -->
+<section class="editor-section">
+  <div class="section-label">
+    <mat-icon>notes</mat-icon>
+    <span>Text Content</span>
+  </div>
+  <mat-form-field appearance="outline" class="full-width">
+    <textarea
+      matInput
+      [value]="node().textContent"
+      (input)="updateTextContent($event)"
+      [readonly]="readOnly()"
+      rows="2"
+      class="content-input"
+    ></textarea>
+  </mat-form-field>
+</section>

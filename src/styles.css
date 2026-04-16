@@ -6,14 +6,6 @@
   box-sizing: border-box;
 }
 
-:root {
-  --xml-tag-color: #00bcd4;
-  --xml-attr-name-color: #ffa726;
-  --xml-attr-value-color: #a5d6a7;
-  --xml-text-color: #e0e0e0;
-  --xml-bracket-color: #78909c;
-}
-
 html,
 body {
   height: 100%;

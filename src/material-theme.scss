@@ -5,8 +5,8 @@ html {
   @include mat.theme(
     (
       color: (
-        primary: mat.$cyan-palette,
-        tertiary: mat.$orange-palette,
+        primary: mat.$azure-palette,
+        tertiary: mat.$violet-palette,
       ),
       typography: Roboto,
       density: -1,
@@ -15,10 +15,11 @@ html {
 }
 
 body {
-  color-scheme: dark;
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
+  color-scheme: light;
+  background-color: #f5f6f8;
+  color: #37474f;
+  font-family: 'DM Sans', 'Roboto', sans-serif;
+  font-size: 14px;
   margin: 0;
   height: 100%;
 }

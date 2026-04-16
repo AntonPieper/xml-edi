@@ -41,10 +41,10 @@ import { XmlAttribute } from '../models/xml-node';
       min-width: 0;
     }
     .equals {
-      font-family: 'Fira Code', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-weight: 700;
       font-size: 1.1em;
-      color: var(--xml-bracket-color, #78909c);
+      color: #90a4ae;
       padding-bottom: 20px;
     }
     @media (max-width: 480px) {
@@ -60,11 +60,15 @@ import { XmlAttribute } from '../models/xml-node';
       }
     }
     .remove-attr-btn {
-      color: #ef5350;
+      color: #b0bec5;
       margin-bottom: 20px;
+      transition: color 0.15s;
+    }
+    .remove-attr-btn:hover {
+      color: #c62828;
     }
     input {
-      font-family: 'Fira Code', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 0.9em;
     }
   `,

@@ -13,35 +13,32 @@ import { XmlNode } from '../models/xml-node';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatSlideToggleModule, MatIconModule],
   styles: `
-    :host {
-      display: block;
-      padding: 12px 0;
-    }
+    :host { display: block; padding: 12px 0; }
     .boolean-control {
       display: flex;
       align-items: center;
       gap: 12px;
     }
     .bool-icon {
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
     }
-    .bool-icon.is-true {
-      color: #66bb6a;
-    }
-    .bool-icon.is-false {
-      color: #ef5350;
-    }
+    .bool-icon.is-true { color: #43a047; }
+    .bool-icon.is-false { color: #c62828; }
     .label-text {
-      font-family: 'Fira Code', monospace;
-      font-size: 0.95em;
-      opacity: 0.8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.9em;
+      color: #546e7a;
     }
   `,
   template: `
     <div class="boolean-control">
-      <mat-icon class="bool-icon" [class.is-true]="isTrue()" [class.is-false]="!isTrue()">
+      <mat-icon
+        class="bool-icon"
+        [class.is-true]="isTrue()"
+        [class.is-false]="!isTrue()"
+      >
         {{ isTrue() ? 'check_circle' : 'cancel' }}
       </mat-icon>
       <mat-slide-toggle

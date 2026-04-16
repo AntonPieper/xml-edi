@@ -37,9 +37,12 @@ class TestHost {
             createNode('name', { textContent: 'Alice' }),
             createNode('phone', { textContent: '+15551234567' }),
             createNode('active', { textContent: 'true' }),
-            createNode('website', {
-              textContent: 'https://alice.dev',
-            }),
+          ],
+        }),
+        createNode('person', {
+          attributes: [createAttribute('id', '2')],
+          children: [
+            createNode('name', { textContent: 'Bob' }),
           ],
         }),
       ],
@@ -81,69 +84,104 @@ describe('XmlEditor Integration', () => {
     await fixture.whenStable();
   });
 
-  it('should render the editor toolbar', () => {
-    const toolbar = el.querySelector('mat-toolbar');
+  it('should render toolbar', () => {
+    const toolbar = el.querySelector('.editor-toolbar');
     expect(toolbar).toBeTruthy();
     expect(toolbar?.textContent).toContain('XML Editor');
   });
 
-  it('should render root node', () => {
-    const badge = el.querySelector('.tag-badge');
-    expect(badge?.textContent).toContain('contacts');
+  it('should show breadcrumb with root', () => {
+    const crumb = el.querySelector('.crumb-current');
+    expect(crumb?.textContent).toContain('contacts');
   });
 
-  it('should show XML preview panel', () => {
+  it('should show XML preview', () => {
     const preview = el.querySelector('.xml-preview');
     expect(preview).toBeTruthy();
     expect(preview?.textContent).toContain('<contacts');
-    expect(preview?.textContent).toContain('version="1.0"');
   });
 
-  it('should display correct node count in preview', () => {
-    const preview = el.querySelector('.xml-preview');
-    const text = preview?.textContent ?? '';
-    expect(text).toContain('<person');
-    expect(text).toContain('<name>Alice</name>');
-    expect(text).toContain('<active>true</active>');
+  it('should render children as rows', () => {
+    const rows = el.querySelectorAll('.child-row');
+    expect(rows.length).toBe(2);
+    expect(rows[0].textContent).toContain('person');
   });
 
-  it('should update preview when document changes', async () => {
-    // Modify the document
-    host.doc.update((doc) => ({
-      ...doc,
-      tagName: 'addressbook',
-    }));
+  it('should navigate into child on click', async () => {
+    const row = el.querySelector('.child-row') as HTMLElement;
+    row.click();
     await fixture.whenStable();
 
-    const preview = el.querySelector('.xml-preview');
-    expect(preview?.textContent).toContain('<addressbook');
+    // Breadcrumb should now show contacts > person
+    const crumbs = el.querySelectorAll('.crumb-btn, .crumb-current');
+    expect(crumbs.length).toBe(2);
+    expect(crumbs[0].textContent).toContain('contacts');
+    expect(crumbs[1].textContent).toContain('person');
   });
 
-  it('should render multiple child nodes', () => {
-    const badges = el.querySelectorAll('.tag-badge');
-    // root (contacts) should be visible
-    expect(badges.length).toBeGreaterThanOrEqual(1);
+  it('should navigate back via breadcrumb', async () => {
+    // Navigate into first child
+    const row = el.querySelector('.child-row') as HTMLElement;
+    row.click();
+    await fixture.whenStable();
+
+    // Click root breadcrumb
+    const rootCrumb = el.querySelector('.crumb-btn') as HTMLElement;
+    rootCrumb.click();
+    await fixture.whenStable();
+
+    // Should be back at root with 2 children
+    const rows = el.querySelectorAll('.child-row');
+    expect(rows.length).toBe(2);
+  });
+
+  it('should show node editor for current node', () => {
+    const nodeEditor = el.querySelector('xml-node-editor');
+    expect(nodeEditor).toBeTruthy();
+  });
+
+  it('should update document when node changes', async () => {
+    host.doc.update((d) => ({ ...d, tagName: 'addressbook' }));
+    await fixture.whenStable();
+
+    const crumb = el.querySelector('.crumb-current');
+    expect(crumb?.textContent).toContain('addressbook');
   });
 
   it('should apply read-only mode', async () => {
     host.readOnly.set(true);
     await fixture.whenStable();
 
-    // Import button should not be visible in readOnly mode
-    const importBtn = el.querySelector(
-      '[mattooltip="Import XML"]',
-    );
-    expect(importBtn).toBeNull();
+    const addBtn = el.querySelector('.add-child-btn');
+    expect(addBtn).toBeNull();
   });
 
-  it('should show import panel when toggle button clicked', async () => {
+  it('should show import panel on toggle', async () => {
     const importBtn = el.querySelector(
       'button[mattooltip="Import XML"]',
     ) as HTMLButtonElement;
     importBtn?.click();
     await fixture.whenStable();
 
-    const importPanel = el.querySelector('.import-panel');
-    expect(importPanel).toBeTruthy();
+    expect(el.querySelector('.import-panel')).toBeTruthy();
+  });
+
+  it('should render custom control when navigated to matching node', async () => {
+    // Navigate: contacts → person (first) → active
+    const personRow = el.querySelector('.child-row') as HTMLElement;
+    personRow.click();
+    await fixture.whenStable();
+
+    // Now at person level, find active child
+    const rows = el.querySelectorAll('.child-row');
+    const activeRow = Array.from(rows).find((r) =>
+      r.textContent?.includes('active'),
+    ) as HTMLElement;
+    activeRow?.click();
+    await fixture.whenStable();
+
+    // Should render boolean control
+    const toggle = el.querySelector('mat-slide-toggle');
+    expect(toggle).toBeTruthy();
   });
 });

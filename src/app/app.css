@@ -1,12 +1,12 @@
 :host {
   display: block;
   height: 100dvh;
-  padding: 16px;
-  background: var(--mat-sys-surface, #121212);
+  padding: 12px;
+  background: #f5f6f8;
 }
 
 @media (max-width: 600px) {
   :host {
-    padding: 4px;
+    padding: 0;
   }
 }

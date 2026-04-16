@@ -55,3 +55,41 @@ export function countNodes(root: XmlNode): number {
     1 + root.children.reduce((sum, child) => sum + countNodes(child), 0)
   );
 }
+
+/**
+ * Walk a path of child IDs from root. Returns the deepest valid node.
+ */
+export function resolveNodeByPath(
+  root: XmlNode,
+  path: string[],
+): XmlNode {
+  let current = root;
+  for (const id of path) {
+    const child = current.children.find((c) => c.id === id);
+    if (!child) return current;
+    current = child;
+  }
+  return current;
+}
+
+export interface BreadcrumbItem {
+  id: string;
+  tagName: string;
+}
+
+export function buildBreadcrumbs(
+  root: XmlNode,
+  path: string[],
+): BreadcrumbItem[] {
+  const crumbs: BreadcrumbItem[] = [
+    { id: root.id, tagName: root.tagName },
+  ];
+  let current = root;
+  for (const id of path) {
+    const child = current.children.find((c) => c.id === id);
+    if (!child) break;
+    crumbs.push({ id: child.id, tagName: child.tagName });
+    current = child;
+  }
+  return crumbs;
+}
