@@ -92,13 +92,20 @@ describe('XmlEditor Integration', () => {
     expect(el.querySelector('.back-btn')).toBeNull();
   });
 
-  it('should show XML preview', () => {
+  it('should show XML preview when showPreview is true', () => {
     const preview = el.querySelector('.xml-preview');
     expect(preview?.textContent).toContain('<contacts');
     expect(preview?.textContent).toContain('version="1.0"');
   });
 
-  it('should render children as branch cards (person has children)', () => {
+  it('should render code editor section', () => {
+    expect(el.querySelector('.code-editor-section')).toBeTruthy();
+    expect(
+      el.querySelector('.code-editor-header')?.textContent,
+    ).toContain('XML Source');
+  });
+
+  it('should render children as branch cards', () => {
     const branches = el.querySelectorAll('.branch-child');
     expect(branches.length).toBe(2);
     expect(branches[0].textContent).toContain('person');
@@ -109,37 +116,30 @@ describe('XmlEditor Integration', () => {
     branch.click();
     await fixture.whenStable();
 
-    // Back button should appear
     const backBtn = el.querySelector('.back-btn');
     expect(backBtn).toBeTruthy();
     expect(backBtn?.textContent).toContain('contacts');
 
-    // Current node should be person
     const crumb = el.querySelector('.crumb-current');
     expect(crumb?.textContent).toContain('person');
   });
 
   it('should show leaf children inline after navigation', async () => {
-    // Navigate into first person
     const branch = el.querySelector('.branch-child') as HTMLElement;
     branch.click();
     await fixture.whenStable();
 
-    // Leaf children (name, phone, active) should render inline
     const leaves = el.querySelectorAll('.leaf-child');
     expect(leaves.length).toBe(3);
   });
 
   it('should navigate back via back button', async () => {
-    // Navigate in
     (el.querySelector('.branch-child') as HTMLElement).click();
     await fixture.whenStable();
 
-    // Navigate back
     (el.querySelector('.back-btn') as HTMLElement).click();
     await fixture.whenStable();
 
-    // Should be at root with 2 branch children
     expect(el.querySelectorAll('.branch-child').length).toBe(2);
     expect(el.querySelector('.back-btn')).toBeNull();
   });
@@ -159,5 +159,22 @@ describe('XmlEditor Integration', () => {
     await fixture.whenStable();
 
     expect(el.querySelector('.import-panel')).toBeTruthy();
+  });
+
+  it('should handle onCodeChange with valid XML', () => {
+    const editor = fixture.debugElement.children[0].componentInstance as XmlEditor;
+    editor.onCodeChange('<root><child>text</child></root>');
+
+    expect(host.doc().tagName).toBe('root');
+    expect(host.doc().children[0].tagName).toBe('child');
+    expect(host.doc().children[0].textContent).toBe('text');
+  });
+
+  it('should ignore invalid XML from code editor', () => {
+    const editor = fixture.debugElement.children[0].componentInstance as XmlEditor;
+    const before = host.doc();
+    editor.onCodeChange('<invalid><unclosed>');
+
+    expect(host.doc()).toBe(before); // unchanged
   });
 });

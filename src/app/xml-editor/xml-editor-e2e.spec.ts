@@ -104,8 +104,9 @@ describe('XmlEditor E2E', () => {
   });
 
   it('should navigate deep and show full breadcrumb', async () => {
-    // 5 levels: each has 1 child that is a branch, except level5 is leaf
-    let current: XmlNode = createNode('level5', { textContent: 'bottom' });
+    let current: XmlNode = createNode('level5', {
+      textContent: 'bottom',
+    });
     for (let i = 4; i >= 1; i--) {
       current = createNode(`level${i}`, { children: [current] });
     }
@@ -113,7 +114,6 @@ describe('XmlEditor E2E', () => {
     await fixture.whenStable();
 
     // Navigate level1 → level2 → level3 (3 branch clicks)
-    // level4 has level5 which is leaf, so level4 shows as branch at level3
     for (let i = 0; i < 3; i++) {
       const branch = el.querySelector('.branch-child') as HTMLElement;
       expect(branch).toBeTruthy();
@@ -121,7 +121,6 @@ describe('XmlEditor E2E', () => {
       await fixture.whenStable();
     }
 
-    // Now at level4, level5 is leaf (inline)
     const crumbCurrent = el.querySelector('.crumb-current');
     expect(crumbCurrent?.textContent).toContain('level4');
 
@@ -141,20 +140,19 @@ describe('XmlEditor E2E', () => {
     );
     await fixture.whenStable();
 
-    // All 3 are leaf nodes → should render inline
     const leaves = el.querySelectorAll('.leaf-child');
     expect(leaves.length).toBe(3);
   });
 
-  it('should separate leaf (inline) and branch (navigable) children', async () => {
+  it('should separate leaf and branch children', async () => {
     host.doc.set(
       createNode('mixed', {
         children: [
-          createNode('title', { textContent: 'Hi' }), // leaf
+          createNode('title', { textContent: 'Hi' }),
           createNode('group', {
             children: [createNode('item')],
-          }), // branch
-          createNode('note', { textContent: 'x' }), // leaf
+          }),
+          createNode('note', { textContent: 'x' }),
         ],
       }),
     );
@@ -175,6 +173,10 @@ describe('XmlEditor E2E', () => {
     const preview = el.querySelector('.xml-preview');
     expect(preview?.textContent).toContain('&amp;');
     expect(preview?.textContent).toContain('&lt;');
+  });
+
+  it('should render code editor section', () => {
+    expect(el.querySelector('.code-editor-section')).toBeTruthy();
   });
 
   it('should handle empty document', async () => {

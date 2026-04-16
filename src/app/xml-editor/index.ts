@@ -9,12 +9,14 @@ export { updateNodeInTree, removeNodeFromTree, addChildToNode, findNodeById, cou
 
 // Services
 export { serializeXml, parseXml } from './services/xml-serializer';
+export { schemaToElementSpecs, createXmlLintSource } from './services/xml-cm-schema';
 
 // Components
 export { XmlEditor } from './components/xml-editor';
 export { XmlNodeEditor } from './components/xml-node-editor';
 export { XmlChildEditor } from './components/xml-child-editor';
 export { XmlAttributeEditor } from './components/xml-attribute-editor';
+export { XmlCodeEditor } from './components/xml-code-editor';
 
 // Controls
 export { TelephoneControl } from './controls/telephone-control';

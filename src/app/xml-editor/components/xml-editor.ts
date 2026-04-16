@@ -28,6 +28,7 @@ import {
 import { serializeXml, parseXml } from '../services/xml-serializer';
 import { XmlNodeEditor } from './xml-node-editor';
 import { XmlChildEditor } from './xml-child-editor';
+import { XmlCodeEditor } from './xml-code-editor';
 
 @Component({
   selector: 'xml-editor',
@@ -37,6 +38,7 @@ import { XmlChildEditor } from './xml-child-editor';
   imports: [
     XmlNodeEditor,
     XmlChildEditor,
+    XmlCodeEditor,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
@@ -48,7 +50,7 @@ export class XmlEditor {
   document = model.required<XmlNode>();
   controls = input<XmlControlMapping[]>([]);
   readOnly = input(false);
-  showPreview = input(true);
+  showPreview = input(false);
   schema = input<XmlSchemaDefinition>();
 
   protected importVisible = signal(false);
@@ -103,11 +105,6 @@ export class XmlEditor {
   /** Tag names the current node is allowed to use (from parent's allowedChildren) */
   allowedTagNames = computed(
     () => this.parentTagDef()?.allowedChildren,
-  );
-
-  /** Tag names allowed as children of current node */
-  allowedChildTagNames = computed(
-    () => this.currentTagDef()?.allowedChildren,
   );
 
   xmlOutput = computed(() => serializeXml(this.document()));
@@ -167,6 +164,59 @@ export class XmlEditor {
       ...node,
       children: node.children.filter((c) => c.id !== childId),
     });
+  }
+
+  // ── Code editor sync ──
+
+  onCodeChange(xmlStr: string) {
+    try {
+      const oldDoc = this.document();
+      const oldPath = this.currentPath();
+      const parsed = parseXml(xmlStr);
+      this.document.set(parsed);
+
+      // Preserve navigation path by matching structure
+      if (oldPath.length > 0) {
+        const newPath = this.remapPath(oldDoc, parsed, oldPath);
+        if (newPath.length > 0) {
+          this.currentPath.set(newPath);
+        }
+      }
+    } catch {
+      // Invalid XML — keep last valid state
+    }
+  }
+
+  /**
+   * Best-effort path preservation after code editor re-parse.
+   * Matches children by index + tag name.
+   */
+  private remapPath(
+    oldDoc: XmlNode,
+    newDoc: XmlNode,
+    oldPath: string[],
+  ): string[] {
+    const newPath: string[] = [];
+    let oldCurrent = oldDoc;
+    let newCurrent = newDoc;
+
+    for (const oldChildId of oldPath) {
+      const oldIdx = oldCurrent.children.findIndex(
+        (c) => c.id === oldChildId,
+      );
+      if (oldIdx < 0 || oldIdx >= newCurrent.children.length) break;
+
+      const oldChild = oldCurrent.children[oldIdx];
+      const newChild = newCurrent.children[oldIdx];
+
+      if (newChild.tagName !== oldChild.tagName) break;
+
+      newPath.push(newChild.id);
+      oldCurrent = oldChild;
+      newCurrent = newChild;
+    }
+
+    return newPath;
   }
 
   // ── Import / Export ──

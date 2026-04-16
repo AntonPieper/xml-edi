@@ -171,20 +171,22 @@
   padding: 3px 4px;
 }
 
-/* ─── Main Layout ─── */
-.editor-main {
+/* ─── Body: vertical split ─── */
+.editor-body {
   display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 
+/* ─── Visual editor (top) ─── */
 .editor-panel {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 16px;
-  min-width: 0;
+  min-height: 120px;
 }
 
 /* ─── Node Card ─── */
@@ -239,14 +241,48 @@
   margin: 0;
 }
 
-/* ─── Preview ─── */
-.preview-panel {
-  width: 360px;
-  min-width: 280px;
-  border-left: 1px solid #e8ecf0;
+/* ─── Code editor (bottom) ─── */
+.code-editor-section {
+  flex-shrink: 0;
+  height: 260px;
+  min-height: 120px;
+  border-top: 1px solid #e8ecf0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.code-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  font-size: 0.78em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #90a4ae;
   background: #f7f9fb;
+  border-bottom: 1px solid #e8ecf0;
+  flex-shrink: 0;
+}
+
+.code-editor-header mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+xml-code-editor {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ─── Legacy preview ─── */
+.preview-panel {
+  border-top: 1px solid #e8ecf0;
+  background: #f7f9fb;
+  flex-shrink: 0;
 }
 
 .preview-header {
@@ -269,8 +305,8 @@
 }
 
 .xml-preview {
-  flex: 1;
   overflow: auto;
+  max-height: 200px;
   margin: 0;
   padding: 14px;
   font-family: 'IBM Plex Mono', monospace;
@@ -282,20 +318,6 @@
 }
 
 /* ─── Responsive ─── */
-@media (max-width: 900px) {
-  .editor-main {
-    flex-direction: column;
-  }
-
-  .preview-panel {
-    width: 100%;
-    min-width: unset;
-    max-height: 220px;
-    border-left: none;
-    border-top: 1px solid #e8ecf0;
-  }
-}
-
 @media (max-width: 600px) {
   .editor-panel {
     padding: 10px;
@@ -334,13 +356,9 @@
     padding: 12px;
   }
 
-  .xml-preview {
-    font-size: 0.7em;
-    padding: 10px;
-  }
-
-  .preview-panel {
-    max-height: 180px;
+  .code-editor-section {
+    height: 200px;
+    min-height: 100px;
   }
 
   .import-panel {

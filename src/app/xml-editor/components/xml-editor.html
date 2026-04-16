@@ -49,7 +49,6 @@
       <mat-icon class="nav-sep">chevron_right</mat-icon>
     }
 
-    <!-- Breadcrumb trail -->
     @for (crumb of breadcrumbs(); track crumb.id; let i = $index; let last = $last) {
       @if (!last) {
         <button class="crumb-btn" (click)="navigateToBreadcrumb(i)">
@@ -62,11 +61,11 @@
     }
   </nav>
 
-  <!-- ─── Main ─── -->
-  <div class="editor-main" [class.with-preview]="showPreview()">
-    <div class="editor-panel">
+  <!-- ─── Body: visual editor + code editor ─── -->
+  <div class="editor-body">
 
-      <!-- Current node: tag name + attributes (always default editor) -->
+    <!-- Visual editor (top) -->
+    <div class="editor-panel">
       <div class="node-card">
         <xml-node-editor
           [node]="currentNode()"
@@ -77,7 +76,6 @@
         />
       </div>
 
-      <!-- Children: inline for leaves, navigable for branches -->
       <section class="children-section">
         <div class="children-header">
           <span class="children-label">Children</span>
@@ -112,15 +110,29 @@
       </section>
     </div>
 
-    <!-- Preview -->
-    @if (showPreview()) {
-      <aside class="preview-panel">
-        <div class="preview-header">
-          <mat-icon>code</mat-icon>
-          <span>XML Output</span>
-        </div>
-        <pre class="xml-preview"><code>{{ xmlOutput() }}</code></pre>
-      </aside>
-    }
+    <!-- Code editor (bottom) -->
+    <div class="code-editor-section">
+      <div class="code-editor-header">
+        <mat-icon>code</mat-icon>
+        <span>XML Source</span>
+      </div>
+      <xml-code-editor
+        [xml]="xmlOutput()"
+        [schema]="schema()"
+        [readOnly]="readOnly()"
+        (xmlChange)="onCodeChange($event)"
+      />
+    </div>
   </div>
+
+  <!-- Optional read-only preview (legacy) -->
+  @if (showPreview()) {
+    <aside class="preview-panel">
+      <div class="preview-header">
+        <mat-icon>code</mat-icon>
+        <span>XML Preview</span>
+      </div>
+      <pre class="xml-preview"><code>{{ xmlOutput() }}</code></pre>
+    </aside>
+  }
 </div>
