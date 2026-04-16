@@ -30,12 +30,15 @@ import { XmlAttribute } from '../models/xml-node';
       align-items: center;
       gap: 8px;
       margin-bottom: 4px;
+      flex-wrap: wrap;
     }
     .attr-name-field {
-      flex: 0 0 35%;
+      flex: 1 1 120px;
+      min-width: 0;
     }
     .attr-value-field {
-      flex: 1;
+      flex: 2 1 150px;
+      min-width: 0;
     }
     .equals {
       font-family: 'Fira Code', monospace;
@@ -43,6 +46,18 @@ import { XmlAttribute } from '../models/xml-node';
       font-size: 1.1em;
       color: var(--xml-bracket-color, #78909c);
       padding-bottom: 20px;
+    }
+    @media (max-width: 480px) {
+      .equals {
+        display: none;
+      }
+      .attribute-row {
+        gap: 4px;
+      }
+      .remove-attr-btn {
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
     }
     .remove-attr-btn {
       color: #ef5350;

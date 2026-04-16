@@ -4,3 +4,9 @@
   padding: 16px;
   background: var(--mat-sys-surface, #121212);
 }
+
+@media (max-width: 600px) {
+  :host {
+    padding: 4px;
+  }
+}

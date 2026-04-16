@@ -10,6 +10,10 @@
   overflow: hidden;
 }
 
+:host-context(xml-node-editor xml-node-editor) .node-panel {
+  border-radius: 6px !important;
+}
+
 /* ─── Header ─── */
 .tag-badge {
   display: inline-flex;
@@ -115,7 +119,7 @@
 
 /* ─── Children ─── */
 .children-list {
-  padding-left: 8px;
+  padding-left: 0;
 }
 
 /* ─── Remove ─── */
@@ -141,4 +145,45 @@
 .attributes-list {
   max-height: 400px;
   overflow-y: auto;
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 600px) {
+  :host {
+    margin-bottom: 4px;
+  }
+
+  .node-body {
+    padding: 4px 0;
+  }
+
+  .editor-section {
+    padding: 4px 0;
+  }
+
+  .tag-badge {
+    font-size: 0.78em;
+    padding: 2px 7px;
+  }
+
+  .meta-chip {
+    font-size: 0.72em;
+    padding: 1px 5px;
+    margin-left: 4px;
+  }
+
+  .section-label {
+    font-size: 0.75em;
+    gap: 4px;
+  }
+
+  .section-label mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .remove-btn {
+    font-size: 0.78em;
+  }
 }
